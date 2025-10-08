@@ -1,7 +1,32 @@
 #include <ncurses.h>
 
+// Keyboard input
+typedef enum
+{
+    MOVE_UP,
+    MOVE_DOWN,
+    MOVE_LEFT,
+    MOVE_RIGHT,
+    MAX_KEYS
+} Action;
+
+typedef struct
+{
+    int arrow;
+    int vim;
+} KeyMapping;
+
+KeyMapping keys[MAX_KEYS];
+
+Action get_action(int ch);
+
 int main(void)
 {
+    keys[MOVE_UP] = (KeyMapping) {KEY_UP, 'k'};
+    keys[MOVE_DOWN] = (KeyMapping) {KEY_DOWN, 'j'};
+    keys[MOVE_LEFT] = (KeyMapping) {KEY_LEFT, 'h'};
+    keys[MOVE_RIGHT] = (KeyMapping) {KEY_RIGHT, 'l'};
+
     const char *files[] = {"main.c", "ui.c", "fs.c", "README.md", "LICENSE"};
     int number_of_files = sizeof(files) / sizeof(files[0]);
     int selected = 0;
@@ -34,16 +59,17 @@ int main(void)
             }
         }
 
-        switch (ch)
+        Action action = get_action(ch);
+        switch (action)
         {
-            case KEY_UP:
+            case MOVE_UP:
                 selected--;
                 if (selected < 0)
                 {
                     selected = 0;
                 }
                 break;
-            case KEY_DOWN:
+            case MOVE_DOWN:
                 selected++;
                 if (selected >= number_of_files)
                 {
@@ -55,4 +81,16 @@ int main(void)
 
     endwin();
     return 0;
+}
+
+Action get_action(int ch)
+{
+    for (int i = 0; i < MAX_KEYS; i++)
+    {
+        if (ch == keys[i].arrow || ch == keys[i].vim)
+        {
+            return i;
+        }
+    }
+    return -1;
 }
