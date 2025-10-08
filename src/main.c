@@ -18,15 +18,11 @@ typedef struct
 
 KeyMapping keys[MAX_KEYS];
 
+void init_keys(void);
 Action get_action(int ch);
 
 int main(void)
 {
-    keys[MOVE_UP] = (KeyMapping) {KEY_UP, 'k'};
-    keys[MOVE_DOWN] = (KeyMapping) {KEY_DOWN, 'j'};
-    keys[MOVE_LEFT] = (KeyMapping) {KEY_LEFT, 'h'};
-    keys[MOVE_RIGHT] = (KeyMapping) {KEY_RIGHT, 'l'};
-
     const char *files[] = {"main.c", "ui.c", "fs.c", "README.md", "LICENSE"};
     int number_of_files = sizeof(files) / sizeof(files[0]);
     int selected = 0;
@@ -37,6 +33,8 @@ int main(void)
     curs_set(FALSE);      // Display cursor
     keypad(stdscr, TRUE); // Enable special keys like arrow keys
     halfdelay(TRUE);
+
+    init_keys();
 
     int ch;
     while ((ch = getch()) != 'q')
@@ -81,6 +79,14 @@ int main(void)
 
     endwin();
     return 0;
+}
+
+void init_keys(void)
+{
+    keys[MOVE_UP] = (KeyMapping) {KEY_UP, 'k'};
+    keys[MOVE_DOWN] = (KeyMapping) {KEY_DOWN, 'j'};
+    keys[MOVE_LEFT] = (KeyMapping) {KEY_LEFT, 'h'};
+    keys[MOVE_RIGHT] = (KeyMapping) {KEY_RIGHT, 'l'};
 }
 
 Action get_action(int ch)
