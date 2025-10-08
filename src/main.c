@@ -1,4 +1,5 @@
 #include <ncurses.h>
+#include <unistd.h>
 
 // Keyboard input
 typedef enum
@@ -32,15 +33,13 @@ int main(void)
     noecho();             // Don't echo keypresses to screen
     curs_set(FALSE);      // Display cursor
     keypad(stdscr, TRUE); // Enable special keys like arrow keys
-    halfdelay(TRUE);
+    nodelay(stdscr, TRUE);
 
     init_keys();
 
     int ch;
     while ((ch = getch()) != 'q')
     {
-        clear();
-
         mvprintw(0, 0, "Press up or down arrow key to move, q to quit.\n\n");
 
         for (int i = 0; i < number_of_files; i++)
@@ -75,6 +74,8 @@ int main(void)
                 }
                 break;
         }
+
+        usleep(10000);
     }
 
     endwin();
