@@ -1,5 +1,4 @@
 #include <ncurses.h>
-#include <unistd.h>
 
 #include "input.h"
 
@@ -55,8 +54,6 @@ int main(void)
                 }
                 break;
         }
-
-        usleep(10000);
     }
 
     endwin();
