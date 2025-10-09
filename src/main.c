@@ -2,19 +2,14 @@
 
 #include "fs.h"
 #include "input.h"
+#include "ui.h"
 
 int main(void)
 {
-    int selected = 0;
-
-    initscr();            // Initializes screen
-    cbreak();             // Disable line buffering (waiting for enter)
-    noecho();             // Don't echo keypresses to screen
-    curs_set(FALSE);      // Display cursor
-    keypad(stdscr, TRUE); // Enable special keys like arrow keys
-    nodelay(stdscr, TRUE);
-
+    init_ui();
     init_keys();
+
+    int selected = 0;
 
     int ch;
     while ((ch = getch()) != 'q')
@@ -39,6 +34,6 @@ int main(void)
         }
     }
 
-    endwin();
+    clean_ui();
     return 0;
 }
