@@ -1,10 +1,11 @@
-# make files
-src/cart
+cart
+
 # Prerequisites
 *.d
 
 # Object files
 *.o
+obj/
 *.ko
 *.obj
 *.elf
@@ -55,3 +56,6 @@ dkms.conf
 
 # debug information files
 *.dwo
+
+# Compile flags
+compile_flags.txt
