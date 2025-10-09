@@ -7,6 +7,7 @@ typedef enum
     MOVE_DOWN,
     MOVE_LEFT,
     MOVE_RIGHT,
+    QUIT,
     MAX_KEYS
 } Action;
 

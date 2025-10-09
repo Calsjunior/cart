@@ -10,6 +10,7 @@ void init_keys(void)
     keys[MOVE_DOWN] = (KeyMapping) {KEY_DOWN, 'j'};
     keys[MOVE_LEFT] = (KeyMapping) {KEY_LEFT, 'h'};
     keys[MOVE_RIGHT] = (KeyMapping) {KEY_RIGHT, 'l'};
+    keys[QUIT] = (KeyMapping) {'q', 'q'};
 }
 
 Action get_action(int ch)
