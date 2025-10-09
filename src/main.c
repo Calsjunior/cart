@@ -1,11 +1,10 @@
 #include <ncurses.h>
 
+#include "fs.h"
 #include "input.h"
 
 int main(void)
 {
-    const char *files[] = {"main.c", "ui.c", "fs.c", "README.md", "LICENSE"};
-    int number_of_files = sizeof(files) / sizeof(files[0]);
     int selected = 0;
 
     initscr();            // Initializes screen
@@ -22,19 +21,7 @@ int main(void)
     {
         mvprintw(0, 0, "Press up or down arrow key to move, q to quit.\n\n");
 
-        for (int i = 0; i < number_of_files; i++)
-        {
-            if (i == selected)
-            {
-                attron(A_REVERSE);
-                mvprintw(i + 2, 2, "%s", files[i]);
-                attroff(A_REVERSE);
-            }
-            else
-            {
-                mvprintw(i + 2, 2, "%s", files[i]);
-            }
-        }
+        list_dir(".");
 
         Action action = get_action(ch);
         switch (action)
@@ -48,10 +35,6 @@ int main(void)
                 break;
             case MOVE_DOWN:
                 selected++;
-                if (selected >= number_of_files)
-                {
-                    selected = number_of_files - 1;
-                }
                 break;
         }
     }
