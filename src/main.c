@@ -24,7 +24,14 @@ int main(void)
             {
                 attron(A_REVERSE);
             }
-            mvprintw(i + 2, 2, "%s", list.names[i]);
+            if (list.entries[i].type == ENTRY_DIR)
+            {
+                mvprintw(i + 2, 2, "%s/", list.entries[i].name);
+            }
+            else if (list.entries[i].type == ENTRY_FILE)
+            {
+                mvprintw(i + 2, 2, "%s", list.entries[i].name);
+            }
             attroff(A_REVERSE);
         }
 
