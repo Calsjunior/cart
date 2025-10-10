@@ -3,7 +3,7 @@
 
 #include "fs.h"
 
-void list_dir(const char *dirname)
+void list_dir(const char *dirname, FileEntry *entry)
 {
     DIR *dir = opendir(dirname);
     if (dir == NULL)
@@ -16,7 +16,8 @@ void list_dir(const char *dirname)
     struct dirent *item;
     while ((item = readdir(dir)) != NULL)
     {
-        printw("%s\n", item->d_name);
+        entry->item_entry[entry->item_count] = item->d_name;
+        entry->item_count++;
     }
 
     closedir(dir);
