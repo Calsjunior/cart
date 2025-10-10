@@ -3,9 +3,21 @@
 
 #define MAX_ITEMS 256
 
+typedef enum
+{
+    ENTRY_FILE,
+    ENTRY_DIR
+} EntryType;
+
 typedef struct
 {
-    char *names[MAX_ITEMS];
+    char *name;
+    EntryType type;
+} DirEntry;
+
+typedef struct
+{
+    DirEntry entries[MAX_ITEMS];
     int count;
 } DirList;
 
