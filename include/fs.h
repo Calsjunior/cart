@@ -5,10 +5,10 @@
 
 typedef struct
 {
-    char *item_entry[MAX_ITEMS];
-    int item_count;
-} FileEntry;
+    char *names[MAX_ITEMS];
+    int count;
+} DirList;
 
-void list_dir(const char *dirname, FileEntry *entry);
+void list_dir(const char *dirname, DirList *list);
 
 #endif

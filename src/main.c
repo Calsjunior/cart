@@ -9,8 +9,8 @@ int main(void)
     init_ui();
     init_keys();
 
-    FileEntry entry = {0};
-    list_dir(".", &entry);
+    DirList list = {0};
+    list_dir(".", &list);
 
     int cursor_index = 0;
     int ch;
@@ -18,34 +18,25 @@ int main(void)
     {
         mvprintw(0, 0, "Press up or down arrow key to move, q to quit.\n\n");
 
-        for (int i = 0; i < entry.item_count; i++)
+        for (int i = 0; i < list.count; i++)
         {
             if (cursor_index == i)
             {
                 attron(A_REVERSE);
             }
-            mvprintw(i + 2, 2, "%s", entry.item_entry[i]);
+            mvprintw(i + 2, 2, "%s", list.names[i]);
             attroff(A_REVERSE);
         }
 
         Action action = get_action(ch);
-        switch (action)
+        if (action == MOVE_UP && cursor_index > 0)
         {
-            case MOVE_UP:
-                if (cursor_index > 0)
-                {
-                    cursor_index--;
-                }
-                break;
-            case MOVE_DOWN:
-                if (cursor_index < entry.item_count - 1)
-                {
-                    cursor_index++;
-                }
-                break;
+            cursor_index--;
         }
-        mvprintw(15, 0, "%i", cursor_index);
-        mvprintw(16, 0, "%i", entry.item_count);
+        else if (action == MOVE_DOWN && cursor_index < list.count - 1)
+        {
+            cursor_index++;
+        }
     }
 
     clean_ui();
