@@ -14,7 +14,7 @@ int main(void)
 
     int cursor_index = 0;
     int ch;
-    while ((ch = getch()) != 'q')
+    while ((ch = getch()))
     {
         mvprintw(0, 0, "Press up or down arrow key to move, q to quit.\n\n");
 
@@ -36,6 +36,10 @@ int main(void)
         }
 
         Action action = get_action(ch);
+        if (action == QUIT)
+        {
+            break;
+        }
         if (action == MOVE_UP && cursor_index > 0)
         {
             cursor_index--;
