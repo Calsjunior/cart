@@ -5,8 +5,8 @@
 
 typedef enum
 {
-    ENTRY_FILE,
-    ENTRY_DIR
+    ENTRY_DIR,
+    ENTRY_FILE
 } EntryType;
 
 typedef struct
@@ -22,5 +22,6 @@ typedef struct
 } DirList;
 
 void list_dir(const char *dirname, DirList *list);
+int compare(const void *arg1, const void *arg2);
 
 #endif

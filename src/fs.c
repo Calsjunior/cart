@@ -2,6 +2,7 @@
 
 #include <dirent.h>
 #include <ncurses.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "fs.h"
@@ -40,7 +41,23 @@ void list_dir(const char *dirname, DirList *list)
         }
         list->entries[list->count].name = dir_entry->d_name;
         list->count++;
+
+        qsort(list->entries, list->count, sizeof(DirEntry), compare);
     }
 
     closedir(dir);
+}
+
+int compare(const void *arg1, const void *arg2)
+{
+    const DirEntry *direntryA = arg1;
+    const DirEntry *direntryB = arg2;
+
+    // Sort directories first then files
+    if (direntryA->type != direntryB->type)
+    {
+        return (direntryA->type - direntryB->type);
+    }
+
+    return strcmp(direntryA->name, direntryB->name);
 }
