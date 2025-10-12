@@ -9,6 +9,9 @@
 
 void list_dir(const char *dirname, DirList *list)
 {
+    // Reset directory entries
+    list->count = 0;
+
     DIR *dir = opendir(dirname);
     if (dir == NULL)
     {
