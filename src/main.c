@@ -10,12 +10,21 @@ int main(void)
     init_keys();
 
     DirList list = {0};
-    list_dir(".", &list);
+    char *current_path = ".";
 
     int cursor_index = 0;
     int ch;
+
+    bool refresh = true;
     while ((ch = getch()))
     {
+        if (refresh)
+        {
+            clear();
+            refresh();
+            list_dir(current_path, &list);
+            refresh = false;
+        }
         mvprintw(0, 0, "Press up or down arrow key to move, q to quit.\n\n");
 
         for (int i = 0; i < list.count; i++)
@@ -47,6 +56,14 @@ int main(void)
         else if (action == MOVE_DOWN && cursor_index < list.count - 1)
         {
             cursor_index++;
+        }
+        else if (action == MOVE_RIGHT && list.entries[cursor_index].type == ENTRY_DIR)
+        {
+            if (current_path != list.entries[cursor_index].name)
+            {
+                current_path = list.entries[cursor_index].name;
+                refresh = true;
+            }
         }
     }
 
