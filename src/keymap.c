@@ -1,6 +1,6 @@
 #include <ncurses.h>
 
-#include "input.h"
+#include "keymap.h"
 
 KeyMapping keys[MAX_KEYS];
 
