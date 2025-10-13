@@ -1,4 +1,7 @@
+#define _DEFAULT_SOURCE
+
 #include <ncurses.h>
+#include <string.h>
 
 #include "fs.h"
 #include "keymap.h"
@@ -52,11 +55,13 @@ void handle_input(Action key, DirList *list, AppState *state)
     }
     else if (key == MOVE_RIGHT && list->entries[state->cursor_index].type == ENTRY_DIR)
     {
-        if (state->dir_path != list->entries[state->cursor_index].name)
-        {
-            state->dir_path = list->entries[state->cursor_index].name;
-            state->refresh = true;
-        }
+        strcat(state->dir_path, "/");
+        strcat(state->dir_path, list->entries[state->cursor_index].name);
+        state->cursor_index = 0;
+        state->refresh = true;
+    }
+    else if (key == MOVE_LEFT)
+    {
     }
 }
 
