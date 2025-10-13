@@ -6,8 +6,8 @@
 #include "state.h"
 
 void init_ui(void);
-void draw_ui(DirList *list, AppState *state);
-void handle_input(Action key, DirList *list, AppState *state);
+void draw_ui(AppState *state, DirList *list);
+void handle_input(Action key, AppState *state, DirList *list);
 void clean_ui(void);
 
 #endif

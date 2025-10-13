@@ -1,5 +1,3 @@
-#define _DEFAULT_SOURCE
-
 #include <ncurses.h>
 #include <string.h>
 
@@ -18,7 +16,7 @@ void init_ui(void)
     nodelay(stdscr, TRUE);
 }
 
-void draw_ui(DirList *list, AppState *state)
+void draw_ui(AppState *state, DirList *list)
 {
     for (int i = 0; i < list->count; i++)
     {
@@ -38,7 +36,7 @@ void draw_ui(DirList *list, AppState *state)
     }
 }
 
-void handle_input(Action key, DirList *list, AppState *state)
+void handle_input(Action key, AppState *state, DirList *list)
 {
     if (key == QUIT)
     {

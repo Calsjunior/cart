@@ -3,6 +3,8 @@
 
 #define MAX_ITEMS 256
 
+#include "state.h"
+
 typedef enum
 {
     ENTRY_DIR,
@@ -21,7 +23,7 @@ typedef struct
     int count;
 } DirList;
 
-void list_dir(const char *dirname, DirList *list);
+void list_dir(AppState *state, DirList *list);
 int compare(const void *arg1, const void *arg2);
 
 #endif

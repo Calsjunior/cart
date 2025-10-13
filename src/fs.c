@@ -6,13 +6,14 @@
 #include <string.h>
 
 #include "fs.h"
+#include "state.h"
 
-void list_dir(const char *dirname, DirList *list)
+void list_dir(AppState *state, DirList *list)
 {
     // Reset directory entries
     list->count = 0;
 
-    DIR *dir = opendir(dirname);
+    DIR *dir = opendir(state->dir_path);
     if (dir == NULL)
     {
         clear();
@@ -21,14 +22,8 @@ void list_dir(const char *dirname, DirList *list)
     }
 
     struct dirent *dir_entry;
-    while ((dir_entry = readdir(dir)) != NULL)
+    while ((dir_entry = readdir(dir)) != NULL && list->count < MAX_ITEMS)
     {
-        // Incase the directory entry has more than the magic 256
-        if (list->count >= MAX_ITEMS)
-        {
-            break;
-        }
-
         if (strcmp(dir_entry->d_name, ".") == 0 || strcmp(dir_entry->d_name, "..") == 0)
         {
             continue;
@@ -44,10 +39,9 @@ void list_dir(const char *dirname, DirList *list)
         }
         list->entries[list->count].name = dir_entry->d_name;
         list->count++;
-
-        qsort(list->entries, list->count, sizeof(DirEntry), compare);
     }
 
+    qsort(list->entries, list->count, sizeof(DirEntry), compare);
     closedir(dir);
 }
 

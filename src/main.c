@@ -1,4 +1,7 @@
+#define _DEFAULT_SOURCE
+
 #include <ncurses.h>
+#include <string.h>
 
 #include "ui.h"
 
@@ -8,7 +11,7 @@ int main(void)
     init_keys();
 
     DirList list;
-    AppState state = {.dir_path = "..", .refresh = true, .running = true};
+    AppState state = {.dir_path = strdup(".."), .refresh = true, .running = true};
 
     int ch;
     while (state.running)
@@ -16,16 +19,17 @@ int main(void)
         if (state.refresh)
         {
             clear();
-            list_dir(state.dir_path, &list);
+            refresh();
+            list_dir(&state, &list);
             state.refresh = false;
         }
         mvprintw(0, 0, "Press up or down arrow key to move, q to quit.\n\n");
 
         ch = getch();
-        draw_ui(&list, &state);
+        draw_ui(&state, &list);
 
         Action key = get_action(ch);
-        handle_input(key, &list, &state);
+        handle_input(key, &state, &list);
     }
 
     clean_ui();
