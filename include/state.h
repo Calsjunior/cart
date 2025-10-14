@@ -6,7 +6,6 @@
 typedef struct
 {
     char *dir_path;
-    int cursor_index;
     bool refresh;
     bool running;
 } AppState;

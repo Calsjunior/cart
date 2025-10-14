@@ -10,8 +10,8 @@ int main(void)
     init_ui();
     init_keys();
 
-    DirList list;
-    AppState state = {.dir_path = strdup(".."), .refresh = true, .running = true};
+    EntryList list;
+    AppState state = {.dir_path = strdup("."), .refresh = true, .running = true};
 
     int ch;
     while (state.running)
@@ -19,14 +19,13 @@ int main(void)
         if (state.refresh)
         {
             clear();
-            refresh();
             list_dir(&state, &list);
             state.refresh = false;
         }
         mvprintw(0, 0, "Press up or down arrow key to move, q to quit.\n\n");
 
+        draw_ui(&list);
         ch = getch();
-        draw_ui(&state, &list);
 
         Action key = get_action(ch);
         handle_input(key, &state, &list);

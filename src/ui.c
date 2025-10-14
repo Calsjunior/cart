@@ -1,5 +1,4 @@
 #include <ncurses.h>
-#include <string.h>
 
 #include "fs.h"
 #include "keymap.h"
@@ -16,50 +15,42 @@ void init_ui(void)
     nodelay(stdscr, TRUE);
 }
 
-void draw_ui(AppState *state, DirList *list)
+void draw_ui(EntryList *list)
 {
-    for (int i = 0; i < list->count; i++)
+    int row = 0;
+    for (EntryNode *current = list->head; current != NULL; current = current->next)
     {
-        if (state->cursor_index == i)
+        if (current == list->cursor)
         {
             attron(A_REVERSE);
         }
-        if (list->entries[i].type == ENTRY_DIR)
+        if (current->type == ENTRY_DIR)
         {
-            mvprintw(i + 2, 2, "%s/", list->entries[i].name);
+            mvprintw(row + 2, 0, "%s/", current->name);
         }
-        else if (list->entries[i].type == ENTRY_FILE)
+        else
         {
-            mvprintw(i + 2, 2, "%s", list->entries[i].name);
+            mvprintw(row + 2, 0, "%s", current->name);
         }
         attroff(A_REVERSE);
+        row++;
     }
 }
 
-void handle_input(Action key, AppState *state, DirList *list)
+void handle_input(Action key, AppState *state, EntryList *list)
 {
     if (key == QUIT)
     {
         state->running = false;
         return;
     }
-    if (key == MOVE_UP && state->cursor_index > 0)
+    else if (key == MOVE_UP && list->cursor != NULL && list->cursor->prev != NULL)
     {
-        state->cursor_index--;
+        list->cursor = list->cursor->prev;
     }
-    else if (key == MOVE_DOWN && state->cursor_index < list->count - 1)
+    else if (key == MOVE_DOWN && list->cursor != NULL && list->cursor->next != NULL)
     {
-        state->cursor_index++;
-    }
-    else if (key == MOVE_RIGHT && list->entries[state->cursor_index].type == ENTRY_DIR)
-    {
-        strcat(state->dir_path, "/");
-        strcat(state->dir_path, list->entries[state->cursor_index].name);
-        state->cursor_index = 0;
-        state->refresh = true;
-    }
-    else if (key == MOVE_LEFT)
-    {
+        list->cursor = list->cursor->next;
     }
 }
 

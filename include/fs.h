@@ -1,8 +1,6 @@
 #ifndef FS_H
 #define FS_H
 
-#define MAX_ITEMS 256
-
 #include "state.h"
 
 typedef enum
@@ -11,19 +9,22 @@ typedef enum
     ENTRY_FILE
 } EntryType;
 
-typedef struct
+typedef struct EntryNode
 {
     char *name;
     EntryType type;
-} DirEntry;
+    struct EntryNode *next;
+    struct EntryNode *prev;
+} EntryNode;
 
 typedef struct
 {
-    DirEntry entries[MAX_ITEMS];
-    int count;
-} DirList;
+    EntryNode *head;
+    EntryNode *tail;
+    EntryNode *cursor;
+} EntryList;
 
-void list_dir(AppState *state, DirList *list);
-int compare(const void *arg1, const void *arg2);
+void add_entry_node(char *name, EntryType type, EntryList *list);
+void list_dir(AppState *state, EntryList *list);
 
 #endif
