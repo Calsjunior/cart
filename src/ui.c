@@ -1,4 +1,5 @@
 #include <ncurses.h>
+#include <string.h>
 
 #include "fs.h"
 #include "keymap.h"
@@ -18,6 +19,7 @@ void init_ui(void)
 void draw_ui(EntryList *list)
 {
     int row = 0;
+    int col = 0;
     for (EntryNode *current = list->head; current != NULL; current = current->next)
     {
         if (current == list->cursor)
@@ -26,18 +28,18 @@ void draw_ui(EntryList *list)
         }
         if (current->type == ENTRY_DIR)
         {
-            mvprintw(row + 2, 0, "%s/", current->name);
+            mvprintw(row + 2, col, "%s/", current->name);
         }
         else
         {
-            mvprintw(row + 2, 0, "%s", current->name);
+            mvprintw(row + 2, col, "%s", current->name);
         }
         attroff(A_REVERSE);
         row++;
     }
 }
 
-void handle_input(Action key, AppState *state, EntryList *list)
+void handle_input(Action key, AppState *state, Stack *stack, EntryList *list)
 {
     if (key == QUIT)
     {
@@ -51,6 +53,18 @@ void handle_input(Action key, AppState *state, EntryList *list)
     else if (key == MOVE_DOWN && list->cursor != NULL && list->cursor->next != NULL)
     {
         list->cursor = list->cursor->next;
+    }
+    else if (key == MOVE_RIGHT && list->cursor->type == ENTRY_DIR)
+    {
+        strcat(state->dir_path, "/");
+        strcat(state->dir_path, list->cursor->name);
+        subdir_stack_push(state, stack);
+        state->refresh = true;
+    }
+    else if (key == MOVE_LEFT && stack->top != NULL)
+    {
+        subdir_stack_pop(state, stack);
+        state->refresh = true;
     }
 }
 

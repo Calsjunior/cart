@@ -61,30 +61,22 @@ void add_entry_node(char *name, EntryType type, EntryList *list)
             node->next = current;
             node->prev = current->prev;
 
-            // Assign the next pointer of node that the current previous is pointing to
-            if (current->prev != NULL)
+            if (current->prev == NULL)
             {
-                current->prev->next = node;
-            }
-            current->prev = node;
-
-            if (node->prev == NULL)
-            {
+                current->prev = node;
                 list->head = node;
                 list->cursor = node;
+                return;
             }
-
-            if (node->next == NULL)
-            {
-                list->tail = node;
-            }
+            current->prev->next = node;
+            current->prev = node;
             return;
         }
-        node->next = current->next;
-        node->prev = current;
-        list->tail = node;
         current = current->next;
     }
+    node->prev = list->tail;
+    list->tail->next = node;
+    list->tail = node;
 }
 
 void list_dir(AppState *state, EntryList *list)
@@ -123,4 +115,52 @@ void list_dir(AppState *state, EntryList *list)
     }
 
     closedir(dir);
+}
+
+void free_stack(Stack *stack)
+{
+    StackNode *current_stack_node = stack->top;
+    while (current_stack_node != NULL)
+    {
+        StackNode *next = current_stack_node->next;
+        free(current_stack_node);
+        current_stack_node = next;
+    }
+}
+
+void subdir_stack_push(AppState *state, Stack *stack)
+{
+    StackNode *stack_node = malloc(sizeof(StackNode));
+    if (stack_node == NULL)
+    {
+        return;
+    }
+    stack_node->path = strdup(state->dir_path);
+    stack_node->next = stack->top;
+
+    stack->top = stack_node;
+}
+
+void subdir_stack_pop(AppState *state, Stack *stack)
+{
+    if (stack->top == NULL)
+    {
+        return;
+    }
+
+    StackNode *stack_node = stack->top;
+    stack->top = stack_node->next;
+
+    if (stack->top != NULL)
+    {
+        free(state->dir_path);
+        state->dir_path = strdup(stack->top->path);
+    }
+    else
+    {
+        free(state->dir_path);
+        state->dir_path = strdup("..");
+    }
+
+    free(stack_node);
 }
