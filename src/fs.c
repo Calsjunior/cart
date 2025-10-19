@@ -150,17 +150,14 @@ void subdir_stack_pop(AppState *state, Stack *stack)
 
     StackNode *stack_node = stack->top;
     stack->top = stack_node->next;
+    free(state->dir_path);
 
-    if (stack->top != NULL)
+    if (stack->top == NULL)
     {
-        free(state->dir_path);
-        state->dir_path = strdup(stack->top->path);
-    }
-    else
-    {
-        free(state->dir_path);
         state->dir_path = strdup("..");
+        return;
     }
+    state->dir_path = strdup(stack->top->path);
 
     free(stack_node);
 }

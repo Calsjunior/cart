@@ -5,6 +5,8 @@
 #include "keymap.h"
 #include "state.h"
 
+#define PATH_MAX 256
+
 void init_ui(void);
 void draw_ui(EntryList *list);
 void handle_input(Action key, AppState *state, Stack *stack, EntryList *list);

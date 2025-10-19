@@ -1,4 +1,7 @@
+#define _DEFAULT_SOURCE
+
 #include <ncurses.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "fs.h"
@@ -56,8 +59,12 @@ void handle_input(Action key, AppState *state, Stack *stack, EntryList *list)
     }
     else if (key == MOVE_RIGHT && list->cursor->type == ENTRY_DIR)
     {
-        strcat(state->dir_path, "/");
-        strcat(state->dir_path, list->cursor->name);
+        char new_path[PATH_MAX];
+        snprintf(new_path, sizeof(new_path), "%s/%s", state->dir_path, list->cursor->name);
+
+        free(state->dir_path);
+        state->dir_path = strdup(new_path);
+
         subdir_stack_push(state, stack);
         state->refresh = true;
     }
