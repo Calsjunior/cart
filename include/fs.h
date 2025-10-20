@@ -3,6 +3,8 @@
 
 #include "state.h"
 
+#define PATH_MAX 4096
+
 // Navigating in the current working directory
 typedef enum
 {

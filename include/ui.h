@@ -5,7 +5,6 @@
 #include "keymap.h"
 #include "state.h"
 
-#define PATH_MAX 4096
 #define HALF_PAGE 17
 
 void init_ui(void);
