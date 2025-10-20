@@ -75,11 +75,11 @@ void draw_ui(AppState *state, EntryList *list)
 
         if (current->type == ENTRY_DIR)
         {
-            mvprintw(row, 2, "[DIR]  %s", current->name);
+            mvprintw(row, 2, "   %s", current->name);
         }
         else
         {
-            mvprintw(row, 2, "[FILE] %s", current->name);
+            mvprintw(row, 2, "  %s", current->name);
         }
 
         attroff(A_REVERSE);
@@ -211,7 +211,7 @@ static void navigation_input(Action key, AppState *state, Stack *stack, EntryLis
     {
         list->cursor = list->tail;
     }
-    else if (key == MOVE_RIGHT && list->cursor->type == ENTRY_DIR)
+    else if (key == MOVE_RIGHT && list->cursor != NULL && list->cursor->type == ENTRY_DIR)
     {
         subdir_stack_push(state, stack, list);
         navigate_subdir(state, list);

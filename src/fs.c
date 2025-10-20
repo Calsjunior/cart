@@ -1,4 +1,3 @@
-#include <linux/limits.h>
 #define _DEFAULT_SOURCE
 
 #include <dirent.h>
@@ -150,6 +149,7 @@ void subdir_stack_push(AppState *state, Stack *stack, EntryList *list)
         return;
     }
 
+    // Push entered directory's name onto the stack
     if (list->cursor != NULL)
     {
         stack_node->cursor_name = strdup(list->cursor->name);
@@ -186,6 +186,7 @@ void stack_restore_cursor(Stack *stack, EntryList *list)
 
     list->scroll_offset = stack_node->scroll_offset;
 
+    // Check if new directory list's name matches name that is pushed to the stack
     for (EntryNode *current = list->head; current != NULL; current = current->next)
     {
         if (strcmp(current->name, stack_node->cursor_name) == 0)
