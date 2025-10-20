@@ -1,5 +1,3 @@
-#include "keymap.h"
-#include "state.h"
 #define _DEFAULT_SOURCE
 
 #include <dirent.h>
@@ -9,6 +7,8 @@
 #include <string.h>
 
 #include "fs.h"
+#include "keymap.h"
+#include "state.h"
 #include "ui.h"
 
 int main(void)

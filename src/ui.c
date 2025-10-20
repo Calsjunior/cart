@@ -12,6 +12,10 @@ static int get_cursor_position(EntryList *list);
 static void adjust_scroll(int visible_lines, EntryList *list);
 static void navigation_input(Action key, AppState *state, Stack *stack, EntryList *list);
 
+static int center_text_menu(int width, const char *text);
+static int left_align_text_menu(int width, const char *text);
+static int right_align_text_menu(int width, const char *text);
+
 int max_rows = 0;
 int max_cols = 0;
 
@@ -101,19 +105,39 @@ void draw_ui(AppState *state, EntryList *list)
 void keymap_help(void)
 {
     int height, width, start_rows, start_cols;
-    height = 15;
-    width = 60;
+    height = max_rows / 2;
+    width = max_cols / 3;
     start_rows = (max_rows - height) / 2;
     start_cols = (max_cols - width) / 2;
     WINDOW *key_help = newwin(height, width, start_rows, start_cols);
     refresh();
 
-    const char *title = "------- Keymaps -------";
-    int cols = (start_cols + strlen(title)) / 4;
+    const char *title = "Keymaps";
+    int title_cols = center_text_menu(width, title);
+    mvwprintw(key_help, 1, title_cols, "%s", title);
 
-    mvwprintw(key_help, 1, cols, title);
-    mvwprintw(key_help, 3, 2, "Navigation:");
-    mvwprintw(key_help, 4, 2, "↑/↓ or k/j  - Move up/down");
+    const char *nav = "Navigation: ";
+    int nav_cols = left_align_text_menu(width, nav);
+    mvwprintw(key_help, 3, nav_cols, "%s", nav);
+
+    const char *move_keys = " /   or k/j  -  Move up/down";
+    const char *nav_keys = " /   or h/l  -  Move left/right";
+    int move_keys_cols = center_text_menu(width, move_keys);
+    mvwprintw(key_help, 5, move_keys_cols + 1, "%s", move_keys);
+    mvwprintw(key_help, 6, move_keys_cols + 1, "%s", nav_keys);
+
+    const char *move_half = "PgDn/PgUp or CTRL D/CTRL U  -  Move half up/down";
+    int move_half_cols = center_text_menu(width, move_half);
+    mvwprintw(key_help, 7, move_half_cols, "%s", move_half);
+
+    const char *move_all = "Home/End or G/SHIFT G  -  Go top/bottom";
+    int move_all_cols = center_text_menu(width, move_all);
+    mvwprintw(key_help, 8, move_all_cols, "%s", move_all);
+
+    const char *quit = "q - Quit";
+    int quit_cols = center_text_menu(width, quit);
+    mvwprintw(key_help, height - 2, quit_cols, "%s", quit);
+
     box(key_help, 0, 0);
     wrefresh(key_help);
 }
@@ -138,20 +162,6 @@ void handle_input(Action key, AppState *state, Stack *stack, EntryList *list)
     }
 }
 
-static int get_cursor_position(EntryList *list)
-{
-    int position = 0;
-    for (EntryNode *current = list->head; current != NULL; current = current->next)
-    {
-        if (current == list->cursor)
-        {
-            return position;
-        }
-        position++;
-    }
-    return 0;
-}
-
 static void adjust_scroll(int visible_lines, EntryList *list)
 {
     int cursor_position = get_cursor_position(list);
@@ -167,6 +177,20 @@ static void adjust_scroll(int visible_lines, EntryList *list)
     {
         list->scroll_offset = cursor_position - visible_lines + 1;
     }
+}
+
+static int get_cursor_position(EntryList *list)
+{
+    int position = 0;
+    for (EntryNode *current = list->head; current != NULL; current = current->next)
+    {
+        if (current == list->cursor)
+        {
+            return position;
+        }
+        position++;
+    }
+    return 0;
 }
 
 static void navigation_input(Action key, AppState *state, Stack *stack, EntryList *list)
@@ -227,6 +251,21 @@ static void navigation_input(Action key, AppState *state, Stack *stack, EntryLis
         navigate_root(state);
         state->refresh = true;
     }
+}
+
+static int center_text_menu(int width, const char *text)
+{
+    return (width - strlen(text)) / 2;
+}
+
+static int left_align_text_menu(int width, const char *text)
+{
+    return (width / strlen(text) - 1);
+}
+
+static int right_align_text_menu(int width, const char *text)
+{
+    return width - strlen(text) - 1;
 }
 
 void clean_ui()
