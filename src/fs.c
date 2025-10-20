@@ -1,3 +1,4 @@
+#include <linux/limits.h>
 #define _DEFAULT_SOURCE
 
 #include <dirent.h>
@@ -8,6 +9,8 @@
 #include "fs.h"
 #include "state.h"
 
+static void add_entry_node(char *name, EntryType type, EntryList *list);
+
 void free_list(EntryList *list)
 {
     EntryNode *current = list->head;
@@ -17,9 +20,14 @@ void free_list(EntryList *list)
         free(current);
         current = next;
     }
+    list->head = NULL;
+    list->tail = NULL;
+    list->cursor = NULL;
+    list->count_entries = 0;
+    list->scroll_offset = 0;
 }
 
-void add_entry_node(char *name, EntryType type, EntryList *list)
+static void add_entry_node(char *name, EntryType type, EntryList *list)
 {
     EntryNode *node = malloc(sizeof(EntryNode));
     if (node == NULL)
@@ -27,7 +35,7 @@ void add_entry_node(char *name, EntryType type, EntryList *list)
         free_list(list);
         return;
     }
-    node->name = name;
+    node->name = strdup(name);
     node->type = type;
     node->next = NULL;
     node->prev = NULL;
@@ -83,8 +91,6 @@ void list_dir(AppState *state, EntryList *list)
 {
     // Initialize the doubly linked list
     free_list(list);
-    list->head = NULL;
-    list->tail = NULL;
 
     DIR *dir = opendir(state->dir_path);
     if (dir == NULL)
@@ -111,7 +117,12 @@ void list_dir(AppState *state, EntryList *list)
         {
             type = ENTRY_FILE;
         }
+        else if (dir_entry->d_type == DT_UNKNOWN)
+        {
+            continue;
+        }
         add_entry_node(dir_entry->d_name, type, list);
+        list->count_entries++;
     }
 
     closedir(dir);
@@ -123,25 +134,34 @@ void free_stack(Stack *stack)
     while (current_stack_node != NULL)
     {
         StackNode *next = current_stack_node->next;
+        free(current_stack_node->path);
+        free(current_stack_node->cursor_name);
         free(current_stack_node);
         current_stack_node = next;
     }
+    stack->top = NULL;
 }
 
-void subdir_stack_push(AppState *state, Stack *stack)
+void subdir_stack_push(AppState *state, Stack *stack, EntryList *list)
 {
     StackNode *stack_node = malloc(sizeof(StackNode));
     if (stack_node == NULL)
     {
         return;
     }
-    stack_node->path = strdup(state->dir_path);
-    stack_node->next = stack->top;
 
+    if (list->cursor != NULL)
+    {
+        stack_node->cursor_name = strdup(list->cursor->name);
+    }
+
+    stack_node->path = strdup(state->dir_path);
+    stack_node->scroll_offset = list->scroll_offset;
+    stack_node->next = stack->top;
     stack->top = stack_node;
 }
 
-void subdir_stack_pop(AppState *state, Stack *stack)
+void subdir_stack_pop(AppState *state, Stack *stack, EntryList *list)
 {
     if (stack->top == NULL)
     {
@@ -150,14 +170,55 @@ void subdir_stack_pop(AppState *state, Stack *stack)
 
     StackNode *stack_node = stack->top;
     stack->top = stack_node->next;
-    free(state->dir_path);
 
+    free(state->dir_path);
+    state->dir_path = strdup(stack_node->path);
+}
+
+void stack_restore_cursor(Stack *stack, EntryList *list)
+{
     if (stack->top == NULL)
     {
-        state->dir_path = strdup("..");
         return;
     }
-    state->dir_path = strdup(stack->top->path);
 
-    free(stack_node);
+    StackNode *stack_node = stack->top;
+
+    list->scroll_offset = stack_node->scroll_offset;
+
+    for (EntryNode *current = list->head; current != NULL; current = current->next)
+    {
+        if (strcmp(current->name, stack_node->cursor_name) == 0)
+        {
+            list->cursor = current;
+            break;
+        }
+    }
+}
+
+void navigate_subdir(AppState *state, EntryList *list)
+{
+    char new_path[PATH_MAX];
+    if (strcmp(state->dir_path, "/") == 0)
+    {
+        snprintf(new_path, sizeof(new_path), "/%s", list->cursor->name);
+    }
+    else
+    {
+        snprintf(new_path, sizeof(new_path), "%s/%s", state->dir_path, list->cursor->name);
+    }
+
+    free(state->dir_path);
+    state->dir_path = strdup(new_path);
+}
+
+void navigate_root(AppState *state)
+{
+    char *slash = strrchr(state->dir_path, '/');
+    if (slash != NULL && slash != state->dir_path)
+    {
+        *slash = '\0';
+        return;
+    }
+    strcpy(state->dir_path, "/");
 }
