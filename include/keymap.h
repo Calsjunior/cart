@@ -13,6 +13,8 @@ typedef enum
     MOVE_DOWN_ALL,
     MOVE_LEFT,
     MOVE_RIGHT,
+    SELECT,
+    DELETE,
     KEYMAP_HELP,
     QUIT,
     MAX_KEYS

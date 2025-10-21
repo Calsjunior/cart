@@ -6,6 +6,7 @@ KeyMapping keys[MAX_KEYS];
 
 void init_keys(void)
 {
+    // Navigation
     keys[MOVE_UP] = (KeyMapping) {KEY_UP, 'k'};
     keys[MOVE_DOWN] = (KeyMapping) {KEY_DOWN, 'j'};
     keys[MOVE_LEFT] = (KeyMapping) {KEY_LEFT, 'h'};
@@ -14,6 +15,12 @@ void init_keys(void)
     keys[MOVE_UP_ALL] = (KeyMapping) {KEY_HOME, 'g'};
     keys[MOVE_DOWN_ALL] = (KeyMapping) {KEY_END, 'G'};
     keys[MOVE_RIGHT] = (KeyMapping) {KEY_RIGHT, 'l'};
+    keys[SELECT] = (KeyMapping) {10, ' '};
+
+    // Action
+    keys[DELETE] = (KeyMapping) {KEY_DC, 'd'};
+
+    // General
     keys[KEYMAP_HELP] = (KeyMapping) {'?', '?'};
     keys[QUIT] = (KeyMapping) {'q', 'q'};
 }

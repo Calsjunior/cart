@@ -11,6 +11,7 @@
 static int get_cursor_position(EntryList *list);
 static void adjust_scroll(int visible_lines, EntryList *list);
 static void navigation_input(Action key, AppState *state, Stack *stack, EntryList *list);
+static void action_input(Action key, AppState *state, EntryList *list);
 
 static int center_text_menu(int width, const char *text);
 static int left_align_text_menu(int width, const char *text);
@@ -50,7 +51,7 @@ void draw_ui(AppState *state, EntryList *list)
     }
 
     // Calculate visible space (between top path and bottom status)
-    int visible_lines = max_rows - 4; // -1 for path, -1 for separator, -2 for status
+    int visible_lines = max_rows - 4; // -2 for path bar, -2 for status bar
 
     adjust_scroll(visible_lines, list);
 
@@ -144,21 +145,32 @@ void keymap_help(void)
 
 void handle_input(Action key, AppState *state, Stack *stack, EntryList *list)
 {
-    if (key == KEYMAP_HELP)
-    {
-        state->mode = MODE_PROMPT;
-        return;
-    }
-
-    if (key == QUIT && state->mode == MODE_PROMPT)
-    {
-        state->mode = MODE_NORMAL;
-        return;
-    }
-
     if (state->mode == MODE_NORMAL)
     {
+        if (key == QUIT)
+        {
+            state->running = false;
+            return;
+        }
+
+        if (key == KEYMAP_HELP)
+        {
+            state->mode = MODE_PROMPT;
+            return;
+        }
+
         navigation_input(key, state, stack, list);
+        action_input(key, state, list);
+        return;
+    }
+
+    if (state->mode == MODE_PROMPT)
+    {
+        if (key == QUIT)
+        {
+            state->mode = MODE_NORMAL;
+            return;
+        }
     }
 }
 
@@ -195,11 +207,7 @@ static int get_cursor_position(EntryList *list)
 
 static void navigation_input(Action key, AppState *state, Stack *stack, EntryList *list)
 {
-    if (key == QUIT)
-    {
-        state->running = false;
-    }
-    else if (key == MOVE_UP && list->cursor != NULL && list->cursor->prev != NULL)
+    if (key == MOVE_UP && list->cursor != NULL && list->cursor->prev != NULL)
     {
         list->cursor = list->cursor->prev;
     }
@@ -235,7 +243,7 @@ static void navigation_input(Action key, AppState *state, Stack *stack, EntryLis
     {
         list->cursor = list->tail;
     }
-    else if (key == MOVE_RIGHT && list->cursor != NULL && list->cursor->type == ENTRY_DIR)
+    else if ((key == MOVE_RIGHT || key == SELECT) && list->cursor != NULL && list->cursor->type == ENTRY_DIR)
     {
         subdir_stack_push(state, stack, list);
         navigate_subdir(state, list);
@@ -244,11 +252,21 @@ static void navigation_input(Action key, AppState *state, Stack *stack, EntryLis
     else if (key == MOVE_LEFT && stack->top != NULL)
     {
         subdir_stack_pop(state, stack, list);
+        state->restore_cursor = true;
         state->refresh = true;
     }
     else if (key == MOVE_LEFT && strcmp(state->dir_path, "/") != 0)
     {
         navigate_root(state);
+        state->refresh = true;
+    }
+}
+
+static void action_input(Action key, AppState *state, EntryList *list)
+{
+    if (key == DELETE)
+    {
+        delete_file(state, list);
         state->refresh = true;
     }
 }
