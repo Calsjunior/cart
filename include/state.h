@@ -14,6 +14,7 @@ typedef struct
     char *dir_path;
     bool refresh;
     bool running;
+    bool restore_cursor;
     AppMode mode;
 } AppState;
 
