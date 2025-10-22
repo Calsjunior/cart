@@ -324,7 +324,7 @@ static void handle_prompt_mode(Action key, AppState *state, Stack *stack, EntryL
     switch (state->prompt_type)
     {
         case PROMPT_HELP:
-            helper_set_mode_normal(state);
+            // helper_set_mode_normal(state);
             break;
 
         case PROMPT_DELETE:

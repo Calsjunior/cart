@@ -24,7 +24,8 @@ int main(void)
                       .refresh = true,
                       .running = true,
                       .restore_cursor = false,
-                      .mode = MODE_NORMAL};
+                      .mode = MODE_NORMAL,
+                      .prompt_type = PROMPT_NONE};
     Stack stack = {.top = NULL};
 
     int ch;
