@@ -27,7 +27,7 @@ Before installing cart, make sure you also have the following:
 -  ncurses library
 -  Any [nerd fonts](https://www.nerdfonts.com) (required for icons)
 
-Popular choices include: `FiraCode Nerd Font, JetBrainsMono Nerd Font, Hack Nerd Font, Cascadia Nerd Font`
+Popular choices include: `FiraCode Nerd Font, JetBrainsMono Nerd Font, Hack Nerd Font, Cascadia Nerd Font`.
 Once installed, make sure your terminal uses the nerd font.
 
 To install the dependencies:
@@ -59,7 +59,7 @@ Run `cart` in your terminal, and voila!
 ## Keymaps
 A keymaps menu can also be found inside the program by pressing '?'
 
-| **Keybinds**               | **Action**             |
+| **Keymaps**               | **Action**             |
 |:--------------------------:|:----------------------:|
 |  /   or k/j              | Move up/down           |
 |  /   or h/l              | Move left/right        |
@@ -71,4 +71,4 @@ A keymaps menu can also be found inside the program by pressing '?'
 Thank you to the makers of [yazi](https://github.com/sxyazi/yazi) and [ncursesFM](https://github.com/FedeDP/ncursesFM) for the inspiration!
 
 ## License
-[MIT (c) Calsjunior](../LICENSE)
+[MIT (c) Calsjunior](LICENSE)
