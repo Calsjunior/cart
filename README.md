@@ -15,7 +15,7 @@ I will (hopefully) keep on learning to bring more features to cart!
 ## Features
 -  Simple, minimal, and clean UI layout
 -  Basic navigation with arrow keys or hjkl for my fellow vim users
-(more keybinds can be found [here](#keybinds)
+(more keymaps can be found [here](#keymaps))
 -  File deletion
 -  File and folder creation (coming soon)
 -  Auto-resize to fit terminal size
@@ -26,6 +26,7 @@ Before installing cart, make sure you also have the following:
 -  `gcc` or `clang`
 -  ncurses library
 -  Any [nerd fonts](https://www.nerdfonts.com) (required for icons)
+
 Popular choices include: `FiraCode Nerd Font, JetBrainsMono Nerd Font, Hack Nerd Font, Cascadia Nerd Font`
 Once installed, make sure your terminal uses the nerd font.
 
