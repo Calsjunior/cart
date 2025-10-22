@@ -9,6 +9,13 @@ typedef enum
     MODE_PROMPT
 } AppMode;
 
+typedef enum
+{
+    PROMPT_NONE,
+    PROMPT_HELP,
+    PROMPT_DELETE
+} PromptType;
+
 typedef struct
 {
     char *dir_path;
