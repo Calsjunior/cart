@@ -5,6 +5,9 @@ Cart is a TUI (Terminal User Interface) file manager for linux-based systems tha
 Although this program was made for [CS50x](https://cs50.harvard.edu/x/)'s final project and as a proof of concept,
 I will (hopefully) keep on learning to bring more features to cart!
 
+<img src="/assets/cart.png">
+
+
 ## Table of contents
 -  [Features](#features)
 -  [Requirements](#requirements)
