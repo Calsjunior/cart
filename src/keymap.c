@@ -2,37 +2,47 @@
 
 #include "keymap.h"
 
-KeyMapping keys[MAX_KEYS];
-
-void init_keys(void)
-{
-    // Navigation
-    keys[MOVE_UP] = (KeyMapping) {KEY_UP, 'k'};
-    keys[MOVE_DOWN] = (KeyMapping) {KEY_DOWN, 'j'};
-    keys[MOVE_LEFT] = (KeyMapping) {KEY_LEFT, 'h'};
-    keys[MOVE_DOWN_HALF] = (KeyMapping) {KEY_NPAGE, CTRL('d')};
-    keys[MOVE_UP_HALF] = (KeyMapping) {KEY_PPAGE, CTRL('u')};
-    keys[MOVE_UP_ALL] = (KeyMapping) {KEY_HOME, 'g'};
-    keys[MOVE_DOWN_ALL] = (KeyMapping) {KEY_END, 'G'};
-    keys[MOVE_RIGHT] = (KeyMapping) {KEY_RIGHT, 'l'};
-    keys[SELECT] = (KeyMapping) {10, ' '};
-
-    // Action
-    keys[DELETE] = (KeyMapping) {KEY_DC, 'd'};
-
-    // General
-    keys[KEYMAP_HELP] = (KeyMapping) {'?', '?'};
-    keys[QUIT] = (KeyMapping) {'q', 'q'};
-}
-
 Action get_action(int ch)
 {
-    for (int i = 0; i < MAX_KEYS; i++)
+    switch (ch)
     {
-        if (ch == keys[i].arrow || ch == keys[i].vim)
-        {
-            return i;
-        }
+        case 'q':
+            return QUIT;
+        case '?':
+            return KEYMAP_HELP;
+
+        // Navigation Keys
+        case KEY_UP:
+        case 'k':
+            return MOVE_UP;
+        case KEY_DOWN:
+        case 'j':
+            return MOVE_DOWN;
+        case KEY_LEFT:
+        case 'h':
+            return MOVE_LEFT;
+        case KEY_RIGHT:
+        case 'l':
+            return MOVE_RIGHT;
+        case KEY_PPAGE:
+        case CTRL('u'):
+            return MOVE_UP_HALF;
+        case KEY_NPAGE:
+        case CTRL('d'):
+            return MOVE_DOWN_HALF;
+        case KEY_HOME:
+        case 'g':
+            return MOVE_UP_ALL;
+        case KEY_END:
+        case 'G':
+            return MOVE_DOWN_ALL;
+
+        // Action
+        case KEY_DC:
+        case 'd':
+            return DELETE;
+        default:
+            break;
     }
     return -1;
 }

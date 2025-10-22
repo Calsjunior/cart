@@ -16,17 +16,9 @@ typedef enum
     SELECT,
     DELETE,
     KEYMAP_HELP,
-    QUIT,
-    MAX_KEYS
+    QUIT
 } Action;
 
-typedef struct
-{
-    int arrow;
-    int vim;
-} KeyMapping;
-
-void init_keys(void);
 Action get_action(int ch);
 
 #endif
