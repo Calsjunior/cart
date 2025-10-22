@@ -103,7 +103,7 @@ void draw_ui(AppState *state, EntryList *list)
     refresh();
 }
 
-void keymap_help(void)
+void draw_keymap_help(void)
 {
     int height, width, start_rows, start_cols;
     height = max_rows / 2;
@@ -141,6 +141,11 @@ void keymap_help(void)
 
     box(key_help, 0, 0);
     wrefresh(key_help);
+}
+
+void delete_entry_prompt(void)
+{
+    WINDOW *deletionwin;
 }
 
 void handle_input(Action key, AppState *state, Stack *stack, EntryList *list)
@@ -267,7 +272,7 @@ static void action_input(Action key, AppState *state, Stack *stack, EntryList *l
 {
     if (key == DELETE && list->cursor->type == ENTRY_FILE)
     {
-        delete_file(state, stack, list);
+        delete_entry(state, stack, list);
         state->restore_cursor = true;
         state->refresh = true;
     }

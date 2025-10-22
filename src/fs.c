@@ -236,7 +236,7 @@ void navigate_root(AppState *state)
     strcpy(state->dir_path, "/");
 }
 
-void delete_file(AppState *state, Stack *stack, EntryList *list)
+void delete_entry(AppState *state, Stack *stack, EntryList *list)
 {
     if (list->cursor->prev != NULL)
     {

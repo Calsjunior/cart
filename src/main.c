@@ -15,7 +15,6 @@ int main(void)
 {
     setlocale(LC_ALL, "");
     init_ui();
-    init_keys();
 
     const char *home = getenv("HOME");
     EntryList list = {.head = NULL, .tail = NULL, .cursor = NULL, .count_entries = 0, .scroll_offset = 0};
@@ -48,7 +47,7 @@ int main(void)
 
         if (state.mode == MODE_PROMPT)
         {
-            keymap_help();
+            draw_keymap_help();
         }
         refresh();
         ch = getch();
