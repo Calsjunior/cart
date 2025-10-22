@@ -15,6 +15,8 @@ typedef enum
     MOVE_RIGHT,
     SELECT,
     DELETE,
+    CONFIRM_YES,
+    CONFIRM_NO,
     KEYMAP_HELP,
     QUIT
 } Action;

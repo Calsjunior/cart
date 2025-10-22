@@ -22,6 +22,8 @@ Action get_action(int ch)
         case 'h':
             return MOVE_LEFT;
         case KEY_RIGHT:
+        case 10:  // Enter key
+        case ' ': // Space key
         case 'l':
             return MOVE_RIGHT;
         case KEY_PPAGE:
@@ -41,6 +43,14 @@ Action get_action(int ch)
         case KEY_DC:
         case 'd':
             return DELETE;
+        case 'y':
+        case 'Y':
+        case '1':
+            return CONFIRM_YES;
+        case 'n':
+        case 'N':
+        case '2':
+            return CONFIRM_NO;
         default:
             break;
     }
