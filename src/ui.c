@@ -50,8 +50,6 @@ void draw_ui(AppState *state, EntryList *list)
         mvaddch(1, i, ACS_HLINE);
     }
 
-    mvprintw(1, 0, "cursor_name: %s", state->cursor_name);
-
     // Calculate visible space (between top path and bottom status)
     int visible_lines = max_rows - 4; // -2 for path bar, -2 for status bar
 
@@ -267,9 +265,10 @@ static void navigation_input(Action key, AppState *state, Stack *stack, EntryLis
 
 static void action_input(Action key, AppState *state, Stack *stack, EntryList *list)
 {
-    if (key == DELETE)
+    if (key == DELETE && list->cursor->type == ENTRY_FILE)
     {
         delete_file(state, stack, list);
+        state->restore_cursor = true;
         state->refresh = true;
     }
 }

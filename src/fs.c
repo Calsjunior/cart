@@ -16,6 +16,7 @@ void free_list(EntryList *list)
     while (current != NULL)
     {
         EntryNode *next = current->next;
+        free(current->name);
         free(current);
         current = next;
     }
@@ -237,11 +238,21 @@ void navigate_root(AppState *state)
 
 void delete_file(AppState *state, Stack *stack, EntryList *list)
 {
-    if (list->cursor->type == ENTRY_FILE)
+    if (list->cursor->prev != NULL)
     {
-        if (remove(list->cursor->name) == 0)
-        {
-            return;
-        }
+        state->cursor_name = strdup(list->cursor->prev->name);
+    }
+    else if (list->cursor->next != NULL)
+    {
+        state->cursor_name = strdup(list->cursor->next->name);
+    }
+    else
+    {
+        state->cursor_name = NULL;
+    }
+
+    if (remove(list->cursor->name) == 0)
+    {
+        return;
     }
 }
