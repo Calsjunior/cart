@@ -44,11 +44,6 @@ int main(void)
         }
 
         draw_ui(&state, &list);
-
-        if (state.mode == MODE_PROMPT)
-        {
-            draw_keymap_help();
-        }
         refresh();
         ch = getch();
 

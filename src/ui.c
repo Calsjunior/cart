@@ -10,8 +10,10 @@
 
 static int get_cursor_position(EntryList *list);
 static void adjust_scroll(int visible_lines, EntryList *list);
-static void navigation_input(Action key, AppState *state, Stack *stack, EntryList *list);
-static void action_input(Action key, AppState *state, Stack *stack, EntryList *list);
+static void handle_normal_mode(Action key, AppState *state, Stack *stack, EntryList *list);
+static void handle_prompt_mode(Action key, AppState *state, Stack *stack, EntryList *list);
+
+static void helper_set_mode_normal(AppState *state);
 
 static int center_text_menu(int width, const char *text);
 static int left_align_text_menu(int width, const char *text);
@@ -40,6 +42,31 @@ void init_ui(void)
 }
 
 void draw_ui(AppState *state, EntryList *list)
+{
+    if (state->mode == MODE_NORMAL)
+    {
+        draw_file_browser(state, list);
+        return;
+    }
+
+    if (state->mode == MODE_PROMPT)
+    {
+        switch (state->prompt_type)
+        {
+            case PROMPT_HELP:
+                draw_keymap_help();
+                break;
+
+            case PROMPT_DELETE:
+                break;
+
+            default:
+                break;
+        }
+    }
+}
+
+void draw_file_browser(AppState *state, EntryList *list)
 {
     clear();
 
@@ -150,32 +177,30 @@ void delete_entry_prompt(void)
 
 void handle_input(Action key, AppState *state, Stack *stack, EntryList *list)
 {
+    if (key == QUIT)
+    {
+        if (state->mode == MODE_PROMPT)
+        {
+            state->mode = MODE_NORMAL;
+            state->prompt_type = PROMPT_NONE;
+            return;
+        }
+
+        // Quit program if mode normal
+        state->running = false;
+        return;
+    }
+
     if (state->mode == MODE_NORMAL)
     {
-        if (key == QUIT)
-        {
-            state->running = false;
-            return;
-        }
-
-        if (key == KEYMAP_HELP)
-        {
-            state->mode = MODE_PROMPT;
-            return;
-        }
-
-        navigation_input(key, state, stack, list);
-        action_input(key, state, stack, list);
+        handle_normal_mode(key, state, stack, list);
         return;
     }
 
     if (state->mode == MODE_PROMPT)
     {
-        if (key == QUIT)
-        {
-            state->mode = MODE_NORMAL;
-            return;
-        }
+        handle_prompt_mode(key, state, stack, list);
+        return;
     }
 }
 
@@ -210,72 +235,121 @@ static int get_cursor_position(EntryList *list)
     return 0;
 }
 
-static void navigation_input(Action key, AppState *state, Stack *stack, EntryList *list)
+static void handle_normal_mode(Action key, AppState *state, Stack *stack, EntryList *list)
 {
-    if (key == MOVE_UP && list->cursor != NULL && list->cursor->prev != NULL)
+    switch (key)
     {
-        list->cursor = list->cursor->prev;
-    }
-    else if (key == MOVE_UP_HALF)
-    {
-        for (int i = 0; i < HALF_PAGE; i++)
-        {
+        case MOVE_UP:
             if (list->cursor != NULL && list->cursor->prev != NULL)
             {
                 list->cursor = list->cursor->prev;
             }
-        }
-    }
-    else if (key == MOVE_UP_ALL)
-    {
-        list->cursor = list->head;
-    }
-    else if (key == MOVE_DOWN && list->cursor != NULL && list->cursor->next != NULL)
-    {
-        list->cursor = list->cursor->next;
-    }
-    else if (key == MOVE_DOWN_HALF)
-    {
-        for (int i = 0; i < HALF_PAGE; i++)
-        {
+            break;
+
+        case MOVE_DOWN:
             if (list->cursor != NULL && list->cursor->next != NULL)
             {
                 list->cursor = list->cursor->next;
             }
-        }
-    }
-    else if (key == MOVE_DOWN_ALL)
-    {
-        list->cursor = list->tail;
-    }
-    else if ((key == MOVE_RIGHT || key == SELECT) && list->cursor != NULL && list->cursor->type == ENTRY_DIR)
-    {
-        save_cursor_state(state, list);
-        subdir_stack_push(state, stack);
-        navigate_subdir(state, list);
-        state->refresh = true;
-    }
-    else if (key == MOVE_LEFT && stack->top != NULL)
-    {
-        subdir_stack_pop(state, stack, list);
-        state->restore_cursor = true;
-        state->refresh = true;
-    }
-    else if (key == MOVE_LEFT && strcmp(state->dir_path, "/") != 0)
-    {
-        navigate_root(state);
-        state->refresh = true;
+            break;
+
+        case MOVE_LEFT:
+            if (stack->top != NULL)
+            {
+                subdir_stack_pop(state, stack, list);
+                state->restore_cursor = true;
+                state->refresh = true;
+                return;
+            }
+
+            if (strcmp(state->dir_path, "/") != 0)
+            {
+                navigate_root(state);
+                state->refresh = true;
+            }
+            break;
+
+        case MOVE_RIGHT:
+            if (list->cursor != NULL && list->cursor->type == ENTRY_DIR)
+            {
+                save_cursor_state(state, list);
+                subdir_stack_push(state, stack);
+                navigate_subdir(state, list);
+                state->refresh = true;
+            }
+            break;
+
+        case MOVE_UP_HALF:
+            for (int i = 0; i < HALF_PAGE; i++)
+            {
+                if (list->cursor != NULL && list->cursor->prev != NULL)
+                {
+                    list->cursor = list->cursor->prev;
+                }
+            }
+            break;
+
+        case MOVE_DOWN_HALF:
+            for (int i = 0; i < HALF_PAGE; i++)
+            {
+                if (list->cursor != NULL && list->cursor->next != NULL)
+                {
+                    list->cursor = list->cursor->next;
+                }
+            }
+            break;
+
+        case MOVE_UP_ALL:
+            list->cursor = list->head;
+            break;
+
+        case MOVE_DOWN_ALL:
+            list->cursor = list->tail;
+            break;
+
+        case KEYMAP_HELP:
+            state->mode = MODE_PROMPT;
+            state->prompt_type = PROMPT_HELP;
+            break;
+
+        case DELETE:
+            state->mode = MODE_PROMPT;
+            state->prompt_type = PROMPT_DELETE;
+            break;
     }
 }
 
-static void action_input(Action key, AppState *state, Stack *stack, EntryList *list)
+static void handle_prompt_mode(Action key, AppState *state, Stack *stack, EntryList *list)
 {
-    if (key == DELETE && list->cursor->type == ENTRY_FILE)
+    switch (state->prompt_type)
     {
-        delete_entry(state, stack, list);
-        state->restore_cursor = true;
-        state->refresh = true;
+        case PROMPT_HELP:
+            helper_set_mode_normal(state);
+            break;
+
+        case PROMPT_DELETE:
+            if (key == CONFIRM_YES)
+            {
+                delete_entry(state, list);
+                helper_set_mode_normal(state);
+                return;
+            }
+
+            if (key == CONFIRM_NO)
+            {
+                helper_set_mode_normal(state);
+            }
+            break;
+
+        default:
+            break;
     }
+}
+
+static void helper_set_mode_normal(AppState *state)
+{
+    state->mode = MODE_NORMAL;
+    state->prompt_type = PROMPT_NONE;
 }
 
 static int center_text_menu(int width, const char *text)

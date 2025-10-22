@@ -25,6 +25,7 @@ typedef struct
     bool running;
     bool restore_cursor;
     AppMode mode;
+    PromptType prompt_type;
 } AppState;
 
 #endif
