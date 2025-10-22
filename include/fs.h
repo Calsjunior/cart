@@ -54,6 +54,6 @@ void restore_cursor(AppState *state, EntryList *list);
 void navigate_subdir(AppState *state, EntryList *list);
 void navigate_root(AppState *state);
 
-void delete_entry(AppState *state, Stack *stack, EntryList *list);
+void delete_entry(AppState *state, EntryList *list);
 
 #endif
