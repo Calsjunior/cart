@@ -29,15 +29,10 @@ typedef struct
     int scroll_offset;
 } EntryList;
 
-void free_list(EntryList *list);
-void list_dir(AppState *state, EntryList *list);
-
 // Navigating into and out of sub directories
 typedef struct StackNode
 {
     char *path;
-    char *cursor_name;
-    int scroll_offset;
     struct StackNode *next;
 } StackNode;
 
@@ -46,12 +41,19 @@ typedef struct Stack
     StackNode *top;
 } Stack;
 
+void free_list(EntryList *list);
+void list_dir(AppState *state, EntryList *list);
+
 void free_stack(Stack *stack);
-void subdir_stack_push(AppState *state, Stack *stack, EntryList *list);
+void subdir_stack_push(AppState *state, Stack *stack);
 void subdir_stack_pop(AppState *state, Stack *stack, EntryList *list);
-void stack_restore_cursor(Stack *stack, EntryList *list);
+
+void save_cursor_state(AppState *state, EntryList *list);
+void restore_cursor(AppState *state, EntryList *list);
 
 void navigate_subdir(AppState *state, EntryList *list);
 void navigate_root(AppState *state);
+
+void delete_file(AppState *state, Stack *stack, EntryList *list);
 
 #endif

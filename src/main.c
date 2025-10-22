@@ -19,7 +19,13 @@ int main(void)
 
     const char *home = getenv("HOME");
     EntryList list = {.head = NULL, .tail = NULL, .cursor = NULL, .count_entries = 0, .scroll_offset = 0};
-    AppState state = {.dir_path = strdup(home), .refresh = true, .running = true, .restore_cursor = false, .mode = MODE_NORMAL};
+    AppState state = {.dir_path = strdup(home),
+                      .cursor_name = NULL,
+                      .scroll_offset = 0,
+                      .refresh = true,
+                      .running = true,
+                      .restore_cursor = false,
+                      .mode = MODE_NORMAL};
     Stack stack = {.top = NULL};
 
     int ch;
@@ -32,9 +38,9 @@ int main(void)
 
             if (state.restore_cursor)
             {
-                stack_restore_cursor(&stack, &list);
+                restore_cursor(&state, &list);
+                state.restore_cursor = false;
             }
-            state.restore_cursor = false;
             state.refresh = false;
         }
 

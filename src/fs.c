@@ -134,14 +134,13 @@ void free_stack(Stack *stack)
     {
         StackNode *next = current_stack_node->next;
         free(current_stack_node->path);
-        free(current_stack_node->cursor_name);
         free(current_stack_node);
         current_stack_node = next;
     }
     stack->top = NULL;
 }
 
-void subdir_stack_push(AppState *state, Stack *stack, EntryList *list)
+void subdir_stack_push(AppState *state, Stack *stack)
 {
     StackNode *stack_node = malloc(sizeof(StackNode));
     if (stack_node == NULL)
@@ -149,14 +148,7 @@ void subdir_stack_push(AppState *state, Stack *stack, EntryList *list)
         return;
     }
 
-    // Push entered directory's name onto the stack
-    if (list->cursor != NULL)
-    {
-        stack_node->cursor_name = strdup(list->cursor->name);
-    }
-
     stack_node->path = strdup(state->dir_path);
-    stack_node->scroll_offset = list->scroll_offset;
     stack_node->next = stack->top;
     stack->top = stack_node;
 }
@@ -173,28 +165,47 @@ void subdir_stack_pop(AppState *state, Stack *stack, EntryList *list)
 
     free(state->dir_path);
     state->dir_path = strdup(stack_node->path);
+
+    free(stack_node->path);
+    free(stack_node);
 }
 
-void stack_restore_cursor(Stack *stack, EntryList *list)
+void save_cursor_state(AppState *state, EntryList *list)
 {
-    if (stack->top == NULL)
+    if (state->cursor_name != NULL)
+    {
+        free(state->cursor_name);
+        state->cursor_name = NULL;
+    }
+
+    if (list->cursor == NULL)
+    {
+        return;
+    }
+    state->cursor_name = strdup(list->cursor->name);
+    state->scroll_offset = list->scroll_offset;
+}
+
+void restore_cursor(AppState *state, EntryList *list)
+{
+    if (state->cursor_name == NULL)
     {
         return;
     }
 
-    StackNode *stack_node = stack->top;
-
-    list->scroll_offset = stack_node->scroll_offset;
+    list->scroll_offset = state->scroll_offset;
 
     // Check if new directory list's name matches name that is pushed to the stack
     for (EntryNode *current = list->head; current != NULL; current = current->next)
     {
-        if (strcmp(current->name, stack_node->cursor_name) == 0)
+        if (strcmp(current->name, state->cursor_name) == 0)
         {
             list->cursor = current;
             break;
         }
     }
+    free(state->cursor_name);
+    state->cursor_name = NULL;
 }
 
 void navigate_subdir(AppState *state, EntryList *list)
@@ -222,4 +233,15 @@ void navigate_root(AppState *state)
         return;
     }
     strcpy(state->dir_path, "/");
+}
+
+void delete_file(AppState *state, Stack *stack, EntryList *list)
+{
+    if (list->cursor->type == ENTRY_FILE)
+    {
+        if (remove(list->cursor->name) == 0)
+        {
+            return;
+        }
+    }
 }

@@ -11,7 +11,7 @@
 static int get_cursor_position(EntryList *list);
 static void adjust_scroll(int visible_lines, EntryList *list);
 static void navigation_input(Action key, AppState *state, Stack *stack, EntryList *list);
-static void action_input(Action key, AppState *state, EntryList *list);
+static void action_input(Action key, AppState *state, Stack *stack, EntryList *list);
 
 static int center_text_menu(int width, const char *text);
 static int left_align_text_menu(int width, const char *text);
@@ -49,6 +49,8 @@ void draw_ui(AppState *state, EntryList *list)
     {
         mvaddch(1, i, ACS_HLINE);
     }
+
+    mvprintw(1, 0, "cursor_name: %s", state->cursor_name);
 
     // Calculate visible space (between top path and bottom status)
     int visible_lines = max_rows - 4; // -2 for path bar, -2 for status bar
@@ -160,7 +162,7 @@ void handle_input(Action key, AppState *state, Stack *stack, EntryList *list)
         }
 
         navigation_input(key, state, stack, list);
-        action_input(key, state, list);
+        action_input(key, state, stack, list);
         return;
     }
 
@@ -245,7 +247,8 @@ static void navigation_input(Action key, AppState *state, Stack *stack, EntryLis
     }
     else if ((key == MOVE_RIGHT || key == SELECT) && list->cursor != NULL && list->cursor->type == ENTRY_DIR)
     {
-        subdir_stack_push(state, stack, list);
+        save_cursor_state(state, list);
+        subdir_stack_push(state, stack);
         navigate_subdir(state, list);
         state->refresh = true;
     }
@@ -262,11 +265,11 @@ static void navigation_input(Action key, AppState *state, Stack *stack, EntryLis
     }
 }
 
-static void action_input(Action key, AppState *state, EntryList *list)
+static void action_input(Action key, AppState *state, Stack *stack, EntryList *list)
 {
     if (key == DELETE)
     {
-        delete_file(state, list);
+        delete_file(state, stack, list);
         state->refresh = true;
     }
 }

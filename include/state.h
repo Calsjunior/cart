@@ -12,6 +12,8 @@ typedef enum
 typedef struct
 {
     char *dir_path;
+    char *cursor_name;
+    int scroll_offset;
     bool refresh;
     bool running;
     bool restore_cursor;
