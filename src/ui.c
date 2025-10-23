@@ -16,8 +16,6 @@ static void handle_prompt_mode(Action key, AppState *state, Stack *stack, EntryL
 static void helper_set_mode_normal(AppState *state);
 
 static int center_text_menu(int width, const char *text);
-static int left_align_text_menu(int width, const char *text);
-static int right_align_text_menu(int width, const char *text);
 
 int max_rows = 0;
 int max_cols = 0;
@@ -58,6 +56,7 @@ void draw_ui(AppState *state, EntryList *list)
                 break;
 
             case PROMPT_DELETE:
+                draw_delete_entry_prompt(list);
                 break;
 
             default:
@@ -137,6 +136,7 @@ void draw_keymap_help(void)
     width = max_cols / 3;
     start_rows = (max_rows - height) / 2;
     start_cols = (max_cols - width) / 2;
+    int left_align_cols = 2;
     WINDOW *key_help = newwin(height, width, start_rows, start_cols);
     refresh();
 
@@ -145,8 +145,7 @@ void draw_keymap_help(void)
     mvwprintw(key_help, 1, title_cols, "%s", title);
 
     const char *nav = "Navigation: ";
-    int nav_cols = left_align_text_menu(width, nav);
-    mvwprintw(key_help, 3, nav_cols, "%s", nav);
+    mvwprintw(key_help, 3, left_align_cols, "%s", nav);
 
     const char *move_keys = " /   or k/j  -  Move up/down";
     const char *nav_keys = " /   or h/l  -  Move left/right";
@@ -158,9 +157,12 @@ void draw_keymap_help(void)
     int move_half_cols = center_text_menu(width, move_half);
     mvwprintw(key_help, 7, move_half_cols, "%s", move_half);
 
-    const char *move_all = "Home/End or G/SHIFT G  -  Go top/bottom";
+    const char *move_all = "Home/End or g/G  -  Go top/bottom";
     int move_all_cols = center_text_menu(width, move_all);
     mvwprintw(key_help, 8, move_all_cols, "%s", move_all);
+
+    const char *action = "Action: ";
+    mvwprintw(key_help, 10, left_align_cols, "%s", action);
 
     const char *quit = "q - Quit";
     int quit_cols = center_text_menu(width, quit);
@@ -170,9 +172,30 @@ void draw_keymap_help(void)
     wrefresh(key_help);
 }
 
-void delete_entry_prompt(void)
+void draw_delete_entry_prompt(EntryList *list)
 {
-    WINDOW *deletionwin;
+    int height, width, start_rows, start_cols;
+    height = max_rows / 5;
+    width = max_cols / 4;
+    start_rows = (max_rows - height) / 4;
+    start_cols = (max_cols - width) / 2;
+    WINDOW *deletionwin = newwin(height, width, start_rows, start_cols);
+    refresh();
+
+    const char *delete_confirmation = "Are you sure you want to delete";
+    int delete_confirmation_cols = center_text_menu(width, delete_confirmation);
+    mvwprintw(deletionwin, 1, delete_confirmation_cols, "%s", delete_confirmation);
+
+    int selected_cols = center_text_menu(width, list->cursor->name);
+    mvwprintw(deletionwin, 2, selected_cols, "%s?", list->cursor->name);
+
+    const char *delete_yes = "1. Yes";
+    mvwprintw(deletionwin, 4, 5, "%s", delete_yes);
+
+    mvwprintw(deletionwin, 4, 30, "2. No");
+
+    box(deletionwin, 0, 0);
+    wrefresh(deletionwin);
 }
 
 void handle_input(Action key, AppState *state, Stack *stack, EntryList *list)
@@ -324,7 +347,6 @@ static void handle_prompt_mode(Action key, AppState *state, Stack *stack, EntryL
     switch (state->prompt_type)
     {
         case PROMPT_HELP:
-            // helper_set_mode_normal(state);
             break;
 
         case PROMPT_DELETE:
@@ -332,6 +354,8 @@ static void handle_prompt_mode(Action key, AppState *state, Stack *stack, EntryL
             {
                 delete_entry(state, list);
                 helper_set_mode_normal(state);
+                state->restore_cursor = true;
+                state->refresh = true;
                 return;
             }
 
@@ -355,16 +379,6 @@ static void helper_set_mode_normal(AppState *state)
 static int center_text_menu(int width, const char *text)
 {
     return (width - strlen(text)) / 2;
-}
-
-static int left_align_text_menu(int width, const char *text)
-{
-    return (width / strlen(text) - 1);
-}
-
-static int right_align_text_menu(int width, const char *text)
-{
-    return width - strlen(text) - 1;
 }
 
 void clean_ui()

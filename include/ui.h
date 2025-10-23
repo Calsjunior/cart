@@ -11,6 +11,7 @@ void init_ui(void);
 void draw_ui(AppState *state, EntryList *list);
 void draw_file_browser(AppState *state, EntryList *list);
 void draw_keymap_help(void);
+void draw_delete_entry_prompt(EntryList *list);
 void handle_input(Action key, AppState *state, Stack *stack, EntryList *list);
 void clean_ui(void);
 
