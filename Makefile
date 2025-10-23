@@ -2,7 +2,7 @@ CC = gcc
 ifeq ($(shell which $(CC)),)
     CC := clang
 endif
-CFLAGS = -g -O0 -Wall -std=c99 -Iinclude
+CFLAGS = -g -O0 -std=c99 -Iinclude
 LDFLAGS = -lncurses
 
 SRC_DIR = src
