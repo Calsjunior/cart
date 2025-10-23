@@ -8,8 +8,13 @@
 #include "state.h"
 #include "ui.h"
 
-static int get_cursor_position(EntryList *list);
+static void draw_file_browser(AppState *state, EntryList *list);
+static void draw_keymap_help(void);
+static void draw_delete_entry_prompt(EntryList *list);
+
 static void adjust_scroll(int visible_lines, EntryList *list);
+static int get_cursor_position(EntryList *list);
+
 static void handle_normal_mode(Action key, AppState *state, Stack *stack, EntryList *list);
 static void handle_prompt_mode(Action key, AppState *state, Stack *stack, EntryList *list);
 
@@ -65,7 +70,40 @@ void draw_ui(AppState *state, EntryList *list)
     }
 }
 
-void draw_file_browser(AppState *state, EntryList *list)
+void handle_input(Action key, AppState *state, Stack *stack, EntryList *list)
+{
+    if (key == QUIT)
+    {
+        if (state->mode == MODE_PROMPT)
+        {
+            helper_set_mode_normal(state);
+            return;
+        }
+
+        // Quit program if mode normal
+        state->running = false;
+        return;
+    }
+
+    if (state->mode == MODE_NORMAL)
+    {
+        handle_normal_mode(key, state, stack, list);
+        return;
+    }
+
+    if (state->mode == MODE_PROMPT)
+    {
+        handle_prompt_mode(key, state, stack, list);
+        return;
+    }
+}
+
+void clean_ui()
+{
+    endwin();
+}
+
+static void draw_file_browser(AppState *state, EntryList *list)
 {
     clear();
 
@@ -129,7 +167,7 @@ void draw_file_browser(AppState *state, EntryList *list)
     refresh();
 }
 
-void draw_keymap_help(void)
+static void draw_keymap_help(void)
 {
     int height, width, start_rows, start_cols;
     height = max_rows / 2;
@@ -172,7 +210,7 @@ void draw_keymap_help(void)
     wrefresh(key_help);
 }
 
-void draw_delete_entry_prompt(EntryList *list)
+static void draw_delete_entry_prompt(EntryList *list)
 {
     int height, width, start_rows, start_cols;
     height = max_rows / 5;
@@ -196,35 +234,6 @@ void draw_delete_entry_prompt(EntryList *list)
 
     box(deletionwin, 0, 0);
     wrefresh(deletionwin);
-}
-
-void handle_input(Action key, AppState *state, Stack *stack, EntryList *list)
-{
-    if (key == QUIT)
-    {
-        if (state->mode == MODE_PROMPT)
-        {
-            state->mode = MODE_NORMAL;
-            state->prompt_type = PROMPT_NONE;
-            return;
-        }
-
-        // Quit program if mode normal
-        state->running = false;
-        return;
-    }
-
-    if (state->mode == MODE_NORMAL)
-    {
-        handle_normal_mode(key, state, stack, list);
-        return;
-    }
-
-    if (state->mode == MODE_PROMPT)
-    {
-        handle_prompt_mode(key, state, stack, list);
-        return;
-    }
 }
 
 static void adjust_scroll(int visible_lines, EntryList *list)
@@ -379,9 +388,4 @@ static void helper_set_mode_normal(AppState *state)
 static int center_text_menu(int width, const char *text)
 {
     return (width - strlen(text)) / 2;
-}
-
-void clean_ui()
-{
-    endwin();
 }

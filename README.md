@@ -62,12 +62,12 @@ Run `cart` in your terminal, and voila!
 ## Keymaps
 A keymaps menu can also be found inside the program by pressing '?'
 
-| **Keymaps**               | **Action**             |
+| **Keymaps**                | **Action**             |
 |:--------------------------:|:----------------------:|
 |  /   or k/j              | Move up/down           |
 |  /   or h/l              | Move left/right        |
-| PgDn/PgUp or CTRL D/CTRL U | Move half page up/down |
-| Home/End or G/SHIFT G      | Go top/bottom          |
+| PgDn/PgUp or CTRL d/CTRL u | Move half page up/down |
+| Home/End or g/G            | Go top/bottom          |
 | Delete/d                   | Delete file            |
 
 ## Inspiration

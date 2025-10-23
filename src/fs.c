@@ -15,83 +15,6 @@ static void add_entry_node(char *name, EntryType type, EntryList *list);
 static void delete_directory_recursively(const char *path);
 static int remove_callback(const char *path, const struct stat *sb, int typeflag, struct FTW *ftwbuf);
 
-void free_list(EntryList *list)
-{
-    EntryNode *current = list->head;
-    while (current != NULL)
-    {
-        EntryNode *next = current->next;
-        free(current->name);
-        free(current);
-        current = next;
-    }
-    list->head = NULL;
-    list->tail = NULL;
-    list->cursor = NULL;
-    list->count_entries = 0;
-    list->scroll_offset = 0;
-}
-
-static void add_entry_node(char *name, EntryType type, EntryList *list)
-{
-    EntryNode *node = malloc(sizeof(EntryNode));
-    if (node == NULL)
-    {
-        free_list(list);
-        return;
-    }
-    node->name = strdup(name);
-    node->type = type;
-    node->next = NULL;
-    node->prev = NULL;
-
-    // If list is empty
-    if (list->head == NULL)
-    {
-        list->head = list->tail = list->cursor = node;
-        return;
-    }
-
-    EntryNode *current = list->head;
-    while (current != NULL)
-    {
-        bool insert_before = FALSE;
-
-        // Sort directory before file
-        if (node->type == ENTRY_DIR && current->type == ENTRY_FILE)
-        {
-            insert_before = TRUE;
-        }
-
-        // If same type then sort in alphabetical order
-        else if (node->type == current->type && strcmp(node->name, current->name) < 0)
-        {
-            insert_before = TRUE;
-        }
-
-        if (insert_before)
-        {
-            node->next = current;
-            node->prev = current->prev;
-
-            if (current->prev == NULL)
-            {
-                current->prev = node;
-                list->head = node;
-                list->cursor = node;
-                return;
-            }
-            current->prev->next = node;
-            current->prev = node;
-            return;
-        }
-        current = current->next;
-    }
-    node->prev = list->tail;
-    list->tail->next = node;
-    list->tail = node;
-}
-
 void list_dir(AppState *state, EntryList *list)
 {
     // Initialize the doubly linked list
@@ -133,17 +56,21 @@ void list_dir(AppState *state, EntryList *list)
     closedir(dir);
 }
 
-void free_stack(Stack *stack)
+void free_list(EntryList *list)
 {
-    StackNode *current_stack_node = stack->top;
-    while (current_stack_node != NULL)
+    EntryNode *current = list->head;
+    while (current != NULL)
     {
-        StackNode *next = current_stack_node->next;
-        free(current_stack_node->path);
-        free(current_stack_node);
-        current_stack_node = next;
+        EntryNode *next = current->next;
+        free(current->name);
+        free(current);
+        current = next;
     }
-    stack->top = NULL;
+    list->head = NULL;
+    list->tail = NULL;
+    list->cursor = NULL;
+    list->count_entries = 0;
+    list->scroll_offset = 0;
 }
 
 void subdir_stack_push(AppState *state, Stack *stack)
@@ -174,6 +101,19 @@ void subdir_stack_pop(AppState *state, Stack *stack, EntryList *list)
 
     free(stack_node->path);
     free(stack_node);
+}
+
+void free_stack(Stack *stack)
+{
+    StackNode *current_stack_node = stack->top;
+    while (current_stack_node != NULL)
+    {
+        StackNode *next = current_stack_node->next;
+        free(current_stack_node->path);
+        free(current_stack_node);
+        current_stack_node = next;
+    }
+    stack->top = NULL;
 }
 
 void save_cursor_state(AppState *state, EntryList *list)
@@ -267,6 +207,66 @@ void delete_entry(AppState *state, EntryList *list)
         remove(list->cursor->name);
         return;
     }
+}
+
+static void add_entry_node(char *name, EntryType type, EntryList *list)
+{
+    EntryNode *node = malloc(sizeof(EntryNode));
+    if (node == NULL)
+    {
+        free_list(list);
+        return;
+    }
+    node->name = strdup(name);
+    node->type = type;
+    node->next = NULL;
+    node->prev = NULL;
+
+    // If list is empty
+    if (list->head == NULL)
+    {
+        list->head = list->tail = list->cursor = node;
+        return;
+    }
+
+    EntryNode *current = list->head;
+    while (current != NULL)
+    {
+        bool insert_before = FALSE;
+
+        // Sort directory before file
+        if (node->type == ENTRY_DIR && current->type == ENTRY_FILE)
+        {
+            insert_before = TRUE;
+        }
+
+        // If same type then sort in alphabetical order
+        else if (node->type == current->type && strcmp(node->name, current->name) < 0)
+        {
+            insert_before = TRUE;
+        }
+
+        if (insert_before)
+        {
+            node->next = current;
+            node->prev = current->prev;
+
+            if (current->prev == NULL)
+            {
+                current->prev = node;
+                list->head = node;
+                list->cursor = node;
+                return;
+            }
+            current->prev->next = node;
+            current->prev = node;
+            return;
+        }
+        current = current->next;
+    }
+    node->prev = list->tail;
+    list->tail->next = node;
+    list->tail = node;
 }
 
 static void delete_directory_recursively(const char *path)

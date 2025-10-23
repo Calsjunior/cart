@@ -41,12 +41,12 @@ typedef struct Stack
     StackNode *top;
 } Stack;
 
-void free_list(EntryList *list);
 void list_dir(AppState *state, EntryList *list);
+void free_list(EntryList *list);
 
-void free_stack(Stack *stack);
 void subdir_stack_push(AppState *state, Stack *stack);
 void subdir_stack_pop(AppState *state, Stack *stack, EntryList *list);
+void free_stack(Stack *stack);
 
 void save_cursor_state(AppState *state, EntryList *list);
 void restore_cursor(AppState *state, EntryList *list);
