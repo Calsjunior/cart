@@ -19,8 +19,8 @@ I will (hopefully) keep on learning to bring more features to cart!
 -  Simple, minimal, and clean UI layout
 -  Basic navigation with arrow keys or hjkl for my fellow vim users
 (more keymaps can be found [here](#keymaps))
--  File deletion
--  File and folder creation (coming soon)
+-  Files and folders deletion
+-  Files and folders creation (coming soon)
 -  Auto-resize to fit terminal size
 
 ## Requirements
