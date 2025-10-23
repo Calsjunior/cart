@@ -1,14 +1,19 @@
+#define _XOPEN_SOURCE 500
 #define _DEFAULT_SOURCE
 
 #include <dirent.h>
+#include <ftw.h>
 #include <ncurses.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "fs.h"
 #include "state.h"
 
 static void add_entry_node(char *name, EntryType type, EntryList *list);
+static void delete_directory_recursively(const char *path);
+static int remove_callback(const char *path, const struct stat *sb, int typeflag, struct FTW *ftwbuf);
 
 void free_list(EntryList *list)
 {
@@ -251,8 +256,33 @@ void delete_entry(AppState *state, EntryList *list)
         state->cursor_name = NULL;
     }
 
-    if (remove(list->cursor->name) == 0)
+    if (list->cursor->type == ENTRY_DIR)
     {
+        delete_directory_recursively(list->cursor->name);
         return;
     }
+
+    if (list->cursor->type == ENTRY_FILE)
+    {
+        remove(list->cursor->name);
+        return;
+    }
+}
+
+static void delete_directory_recursively(const char *path)
+{
+    nftw(path, remove_callback, 64, FTW_DEPTH | FTW_PHYS);
+}
+
+// Remove_callback needed for nftw per documentation
+static int remove_callback(const char *path, const struct stat *sb, int typeflag, struct FTW *ftwbuf)
+{
+    int result = remove(path);
+
+    if (result != 0)
+    {
+        return -1;
+    }
+
+    return result;
 }
