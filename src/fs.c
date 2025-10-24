@@ -1,4 +1,5 @@
-#define _XOPEN_SOURCE 500
+#define _XOPEN_SOURCE 700
+#define _DARWIN_C_SOURCE
 #define _DEFAULT_SOURCE
 
 #include <dirent.h>
