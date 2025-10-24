@@ -73,7 +73,7 @@ void free_list(EntryList *list)
     list->scroll_offset = 0;
 }
 
-void subdir_stack_push(AppState *state, Stack *stack)
+void subdir_stack_push(AppState *state, Stack *stack, EntryList *list)
 {
     StackNode *stack_node = malloc(sizeof(StackNode));
     if (stack_node == NULL)
@@ -82,6 +82,18 @@ void subdir_stack_push(AppState *state, Stack *stack)
     }
 
     stack_node->path = strdup(state->dir_path);
+
+    if (list->cursor == NULL)
+    {
+        stack_node->cursor_name = NULL;
+        stack_node->scroll_offset = 0;
+    }
+    else
+    {
+        stack_node->cursor_name = strdup(list->cursor->name);
+        stack_node->scroll_offset = list->scroll_offset;
+    }
+
     stack_node->next = stack->top;
     stack->top = stack_node;
 }
@@ -99,6 +111,21 @@ void subdir_stack_pop(AppState *state, Stack *stack, EntryList *list)
     free(state->dir_path);
     state->dir_path = strdup(stack_node->path);
 
+    if (state->cursor_name != NULL)
+    {
+        free(state->cursor_name);
+    }
+
+    if (stack_node->cursor_name != NULL)
+    {
+        state->cursor_name = strdup(stack_node->cursor_name);
+    }
+    else
+    {
+        state->cursor_name = NULL;
+    }
+    state->scroll_offset = stack_node->scroll_offset;
+
     free(stack_node->path);
     free(stack_node);
 }
@@ -114,22 +141,6 @@ void free_stack(Stack *stack)
         current_stack_node = next;
     }
     stack->top = NULL;
-}
-
-void save_cursor_state(AppState *state, EntryList *list)
-{
-    if (state->cursor_name != NULL)
-    {
-        free(state->cursor_name);
-        state->cursor_name = NULL;
-    }
-
-    if (list->cursor == NULL)
-    {
-        return;
-    }
-    state->cursor_name = strdup(list->cursor->name);
-    state->scroll_offset = list->scroll_offset;
 }
 
 void restore_cursor(AppState *state, EntryList *list)

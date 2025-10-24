@@ -33,6 +33,8 @@ typedef struct
 typedef struct StackNode
 {
     char *path;
+    char *cursor_name;
+    int scroll_offset;
     struct StackNode *next;
 } StackNode;
 
@@ -44,7 +46,7 @@ typedef struct Stack
 void list_dir(AppState *state, EntryList *list);
 void free_list(EntryList *list);
 
-void subdir_stack_push(AppState *state, Stack *stack);
+void subdir_stack_push(AppState *state, Stack *stack, EntryList *list);
 void subdir_stack_pop(AppState *state, Stack *stack, EntryList *list);
 void free_stack(Stack *stack);
 
