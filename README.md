@@ -71,7 +71,7 @@ For **bash/zsh**
 export EDITOR=nvim
 ```
 
-For fish
+For **fish**
 ```fish
 set -gx EDITOR nvim
 ```
