@@ -10,6 +10,8 @@ Action get_action(int ch)
             return QUIT;
         case '?':
             return KEYMAP_HELP;
+        case KEY_RESIZE:
+            return RESIZE;
 
         // Navigation Keys
         case KEY_UP:

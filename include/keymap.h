@@ -18,6 +18,7 @@ typedef enum
     CONFIRM_YES,
     CONFIRM_NO,
     OPEN,
+    RESIZE,
     KEYMAP_HELP,
     QUIT
 } Action;

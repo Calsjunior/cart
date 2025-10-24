@@ -22,6 +22,8 @@ static void helper_set_mode_normal(AppState *state);
 
 static int center_text_menu(int width, const char *text);
 
+static void do_resize(void);
+
 int max_rows = 0;
 int max_cols = 0;
 
@@ -72,6 +74,11 @@ void draw_ui(AppState *state, EntryList *list)
 
 void handle_input(Action key, AppState *state, Stack *stack, EntryList *list)
 {
+    if (key == RESIZE)
+    {
+        do_resize();
+    }
+
     if (key == QUIT)
     {
         if (state->mode == MODE_PROMPT)
@@ -148,7 +155,7 @@ static void draw_file_browser(AppState *state, EntryList *list)
         }
         else
         {
-            mvprintw(row, 2, "  %s", current->name);
+            mvprintw(row, 2, "   %s", current->name);
         }
 
         attroff(A_REVERSE);
@@ -393,4 +400,12 @@ static void helper_set_mode_normal(AppState *state)
 static int center_text_menu(int width, const char *text)
 {
     return (width - strlen(text)) / 2;
+}
+
+static void do_resize(void)
+{
+    endwin();
+    refresh();
+    clear();
+    getmaxyx(stdscr, max_rows, max_cols);
 }
