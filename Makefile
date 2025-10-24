@@ -12,7 +12,7 @@ SOURCES = $(wildcard $(SRC_DIR)/*.c)
 OBJECTS = $(SOURCES:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 TARGET = cart
 
-PREFIX = $(HOME)/.local
+PREFIX = /usr/local
 BIN_DIR = $(PREFIX)/bin
 
 all: $(TARGET)
