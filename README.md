@@ -21,6 +21,7 @@ I will (hopefully) keep on learning to bring more features to cart!
 (more keymaps can be found [here](#keymaps))
 -  Files and folders deletion
 -  Files and folders creation (coming soon)
+-  Open your favorite text editor straight from cart
 -  Auto-resize to fit terminal size
 
 ## Requirements
@@ -69,6 +70,7 @@ A keymaps menu can also be found inside the program by pressing '?'
 | PgDn/PgUp or CTRL d/CTRL u | Move half page up/down |
 | Home/End or g/G            | Go top/bottom          |
 | Delete/d                   | Delete file            |
+| v                          | Open text editor       |
 
 ## Inspiration
 Thank you to the makers of [yazi](https://github.com/sxyazi/yazi) and [ncursesFM](https://github.com/FedeDP/ncursesFM) for the inspiration!
