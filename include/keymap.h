@@ -17,6 +17,7 @@ typedef enum
     DELETE,
     CONFIRM_YES,
     CONFIRM_NO,
+    OPEN,
     KEYMAP_HELP,
     QUIT
 } Action;

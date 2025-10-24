@@ -51,6 +51,8 @@ Action get_action(int ch)
         case 'N':
         case '2':
             return CONFIRM_NO;
+        case 'v':
+            return OPEN;
         default:
             break;
     }

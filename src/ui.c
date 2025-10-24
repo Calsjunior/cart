@@ -348,6 +348,9 @@ static void handle_normal_mode(Action key, AppState *state, Stack *stack, EntryL
             state->mode = MODE_PROMPT;
             state->prompt_type = PROMPT_DELETE;
             break;
+
+        case OPEN:
+            open_entry(state, list);
     }
 }
 

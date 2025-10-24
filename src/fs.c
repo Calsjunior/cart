@@ -196,19 +196,46 @@ void delete_entry(AppState *state, EntryList *list)
         state->cursor_name = NULL;
     }
 
-    if (list->cursor->type == ENTRY_DIR)
+    char full_path[PATH_MAX];
+    snprintf(full_path, sizeof(full_path), "%s/%s", state->dir_path, list->cursor->name);
+
+    if (remove(full_path) == 0)
     {
-        delete_directory_recursively(list->cursor->name);
         return;
     }
 
-    if (list->cursor->type == ENTRY_FILE)
+    if (list->cursor->type == ENTRY_DIR)
     {
-        remove(list->cursor->name);
+        delete_directory_recursively(full_path);
         return;
     }
 }
 
+void open_entry(AppState *state, EntryList *list)
+{
+    if (list->cursor == NULL)
+    {
+        return;
+    }
+
+    const char *editor = getenv("EDITOR");
+    if (editor == NULL)
+    {
+        editor = getenv("VISUAL");
+    }
+
+    if (editor == NULL)
+    {
+        editor = "vim";
+    }
+
+    char full_path[PATH_MAX];
+    snprintf(full_path, sizeof(full_path), "%s/%s", state->dir_path, list->cursor->name);
+
+    char command[512];
+    snprintf(command, sizeof(command), "%s '%s'", editor, full_path);
+    system(command);
+}
 static void add_entry_node(char *name, EntryType type, EntryList *list)
 {
     EntryNode *node = malloc(sizeof(EntryNode));
