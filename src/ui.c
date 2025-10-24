@@ -350,6 +350,9 @@ static void handle_normal_mode(Action key, AppState *state, Stack *stack, EntryL
 
         case OPEN:
             open_entry(state, list);
+            state->restore_cursor = true;
+            state->refresh = true;
+            break;
     }
 }
 

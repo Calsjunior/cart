@@ -229,6 +229,13 @@ void open_entry(AppState *state, EntryList *list)
         return;
     }
 
+    if (state->cursor_name != NULL)
+    {
+        free(state->cursor_name);
+    }
+    state->cursor_name = strdup(list->cursor->name);
+    state->scroll_offset = list->scroll_offset;
+
     const char *editor = getenv("EDITOR");
     if (editor == NULL)
     {
@@ -243,9 +250,15 @@ void open_entry(AppState *state, EntryList *list)
     char full_path[PATH_MAX];
     snprintf(full_path, sizeof(full_path), "%s/%s", state->dir_path, list->cursor->name);
 
+    def_prog_mode();
+    endwin();
+
     char command[512];
     snprintf(command, sizeof(command), "%s '%s'", editor, full_path);
     system(command);
+
+    reset_prog_mode();
+    refresh();
 }
 static void add_entry_node(char *name, EntryType type, EntryList *list)
 {
