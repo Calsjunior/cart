@@ -13,6 +13,7 @@ I will (hopefully) keep on learning to bring more features to cart!
 -  [Requirements](#requirements)
 -  [Installation](#installation)
 -  [Usage](#usage)
+-  [Configuring Your Text Editor](#configuring-your-text-editor)
 -  [Keymaps](#keymaps)
 
 ## Features
@@ -44,21 +45,36 @@ To install cart, simply clone the repo with
 ```bash
 git clone https://github.com/Calsjunior/cart
 cd cart
-make install
+sudo make install
 ```
 
 To uninstall cart, run 
 ```bash
 cd cart
-make uninstall
+sudo make uninstall
 ```
 or
 ```bash
-rm -rf ~/.local/bin/cart
+rm -rf /usr/local/bin/cart
 ```
 
 ## Usage 
 Run `cart` in your terminal, and voila!
+
+## Configuring Your Text Editor
+**cart** can open files and folders using your preferred text editor.
+
+You can set your editor globally in your shell config so cart and other CLI tools will use it automatically.
+
+For **bash/zsh**
+```bash
+export EDITOR=nvim
+```
+
+For fish
+```fish
+set -gx EDITOR nvim
+```
 
 ## Keymaps
 A keymaps menu can also be found inside the program by pressing '?'
