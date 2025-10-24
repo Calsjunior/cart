@@ -311,7 +311,7 @@ static void handle_normal_mode(Action key, AppState *state, Stack *stack, EntryL
             break;
 
         case MOVE_UP_HALF:
-            for (int i = 0; i < HALF_PAGE; i++)
+            for (int i = 0; i < list->count_entries / 2; i++)
             {
                 if (list->cursor != NULL && list->cursor->prev != NULL)
                 {
@@ -321,7 +321,7 @@ static void handle_normal_mode(Action key, AppState *state, Stack *stack, EntryL
             break;
 
         case MOVE_DOWN_HALF:
-            for (int i = 0; i < HALF_PAGE; i++)
+            for (int i = 0; i < list->count_entries / 2; i++)
             {
                 if (list->cursor != NULL && list->cursor->next != NULL)
                 {

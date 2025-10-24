@@ -5,8 +5,6 @@
 #include "keymap.h"
 #include "state.h"
 
-#define HALF_PAGE 17
-
 void init_ui(void);
 void draw_ui(AppState *state, EntryList *list);
 void handle_input(Action key, AppState *state, Stack *stack, EntryList *list);
