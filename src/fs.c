@@ -1,3 +1,4 @@
+#include <stddef.h>
 #define _XOPEN_SOURCE 700
 #define _DARWIN_C_SOURCE
 #define _DEFAULT_SOURCE
@@ -15,6 +16,8 @@
 static void add_entry_node(char *name, EntryType type, EntryList *list);
 static void delete_directory_recursively(const char *path);
 static int remove_callback(const char *path, const struct stat *sb, int typeflag, struct FTW *ftwbuf);
+
+char *helper_set_full_path(char *buffer, size_t buffer_size, char *name, AppState *state);
 
 void list_dir(AppState *state, EntryList *list)
 {
@@ -169,14 +172,7 @@ void restore_cursor(AppState *state, EntryList *list)
 void navigate_subdir(AppState *state, EntryList *list)
 {
     char new_path[PATH_MAX];
-    if (strcmp(state->dir_path, "/") == 0)
-    {
-        snprintf(new_path, sizeof(new_path), "/%s", list->cursor->name);
-    }
-    else
-    {
-        snprintf(new_path, sizeof(new_path), "%s/%s", state->dir_path, list->cursor->name);
-    }
+    helper_set_full_path(new_path, sizeof(new_path), list->cursor->name, state);
 
     free(state->dir_path);
     state->dir_path = strdup(new_path);
@@ -209,7 +205,7 @@ void delete_entry(AppState *state, EntryList *list)
     }
 
     char full_path[PATH_MAX];
-    snprintf(full_path, sizeof(full_path), "%s/%s", state->dir_path, list->cursor->name);
+    helper_set_full_path(full_path, sizeof(full_path), list->cursor->name, state);
 
     if (remove(full_path) == 0)
     {
@@ -249,7 +245,7 @@ void open_entry(AppState *state, EntryList *list)
     }
 
     char full_path[PATH_MAX];
-    snprintf(full_path, sizeof(full_path), "%s/%s", state->dir_path, list->cursor->name);
+    helper_set_full_path(full_path, sizeof(full_path), list->cursor->name, state);
 
     def_prog_mode();
     endwin();
@@ -261,6 +257,40 @@ void open_entry(AppState *state, EntryList *list)
     reset_prog_mode();
     refresh();
 }
+
+void create_entry(char *name, AppState *state)
+{
+    int name_len = strlen(name);
+    if (name == NULL || name_len == 0)
+    {
+        return;
+    }
+
+    char full_path[PATH_MAX];
+    helper_set_full_path(full_path, sizeof(full_path), name, state);
+
+    if (name_len > 0 && name[name_len - 1] == '/')
+    {
+        mkdir(full_path, 0777);
+    }
+    else
+    {
+        FILE *file = fopen(full_path, "w");
+        if (file == NULL)
+        {
+            return;
+        }
+        fclose(file);
+    }
+
+    if (state->cursor_name != NULL)
+    {
+        free(state->cursor_name);
+    }
+    state->cursor_name = strdup(name);
+    state->scroll_offset = 0;
+}
+
 static void add_entry_node(char *name, EntryType type, EntryList *list)
 {
     EntryNode *node = malloc(sizeof(EntryNode));
@@ -337,4 +367,17 @@ static int remove_callback(const char *path, const struct stat *sb, int typeflag
     }
 
     return result;
+}
+
+char *helper_set_full_path(char *buffer, size_t buffer_size, char *name, AppState *state)
+{
+    if (strcmp(state->dir_path, "/") == 0)
+    {
+        snprintf(buffer, buffer_size, "/%s", name);
+    }
+    else
+    {
+        snprintf(buffer, buffer_size, "%s/%s", state->dir_path, name);
+    }
+    return buffer;
 }

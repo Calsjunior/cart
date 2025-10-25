@@ -11,6 +11,7 @@
 static void draw_file_browser(AppState *state, EntryList *list);
 static void draw_keymap_help(void);
 static void draw_delete_entry_prompt(EntryList *list);
+static void draw_create_entry_prompt(AppState *state);
 
 static void adjust_scroll(int visible_lines, EntryList *list);
 static int get_cursor_position(EntryList *list);
@@ -66,6 +67,9 @@ void draw_ui(AppState *state, EntryList *list)
                 draw_delete_entry_prompt(list);
                 break;
 
+            case PROMPT_CREATE:
+                draw_create_entry_prompt(state);
+                break;
             default:
                 break;
         }
@@ -174,6 +178,7 @@ static void draw_file_browser(AppState *state, EntryList *list)
     refresh();
 }
 
+// TODO: fix these disguisting UI madness
 static void draw_keymap_help(void)
 {
     int height, width, start_rows, start_cols;
@@ -241,6 +246,33 @@ static void draw_delete_entry_prompt(EntryList *list)
 
     box(deletionwin, 0, 0);
     wrefresh(deletionwin);
+}
+
+static void draw_create_entry_prompt(AppState *state)
+{
+    int height, width, start_rows, start_cols;
+    height = max_rows / 5;
+    width = max_cols / 3;
+    start_rows = (max_rows - height) / 4;
+    start_cols = (max_cols - width) / 2;
+    WINDOW *creationwin = newwin(height, width, start_rows, start_cols);
+    refresh();
+
+    const char *create_entry = "Add new file to the current working directory";
+    int create_entry_cols = center_text_menu(width, create_entry);
+    mvwprintw(creationwin, 1, create_entry_cols, "%s", create_entry);
+
+    box(creationwin, 0, 0);
+
+    echo();
+    curs_set(TRUE);
+
+    mvwgetnstr(creationwin, 3, 5, state->input, sizeof(state->input) - 1);
+
+    noecho();
+    curs_set(FALSE);
+
+    wrefresh(creationwin);
 }
 
 static void adjust_scroll(int visible_lines, EntryList *list)
@@ -356,9 +388,13 @@ static void handle_normal_mode(Action key, AppState *state, Stack *stack, EntryL
             break;
 
         case OPEN:
-            open_entry(state, list);
-            state->restore_cursor = true;
-            state->refresh = true;
+            state->mode = MODE_PROMPT;
+            state->prompt_type = PROMPT_OPEN;
+            break;
+
+        case CREATE:
+            state->mode = MODE_PROMPT;
+            state->prompt_type = PROMPT_CREATE;
             break;
     }
 }
@@ -386,6 +422,18 @@ static void handle_prompt_mode(Action key, AppState *state, Stack *stack, EntryL
             }
             break;
 
+        case PROMPT_OPEN:
+            open_entry(state, list);
+            helper_set_mode_normal(state);
+            state->restore_cursor = true;
+            state->refresh = true;
+
+        case PROMPT_CREATE:
+            create_entry(state->input, state);
+            helper_set_mode_normal(state);
+            state->restore_cursor = true;
+            state->refresh = true;
+            break;
         default:
             break;
     }
