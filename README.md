@@ -21,7 +21,7 @@ I will (hopefully) keep on learning to bring more features to cart!
 -  Basic navigation with arrow keys or hjkl for my fellow vim users
 (more keymaps can be found [here](#keymaps))
 -  Files and folders deletion
--  Files and folders creation (coming soon)
+-  Files and folders creation
 -  Open your favorite text editor straight from cart
 -  Auto-resize to fit terminal size
 
