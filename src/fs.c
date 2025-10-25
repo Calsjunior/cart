@@ -191,11 +191,7 @@ void navigate_root(AppState *state)
 
 void delete_entry(AppState *state, EntryList *list)
 {
-    if (list->cursor->prev != NULL)
-    {
-        state->cursor_name = strdup(list->cursor->prev->name);
-    }
-    else if (list->cursor->next != NULL)
+    if (list->cursor->next != NULL)
     {
         state->cursor_name = strdup(list->cursor->next->name);
     }
@@ -258,6 +254,7 @@ void open_entry(AppState *state, EntryList *list)
     refresh();
 }
 
+// TODO: add nested directory/files logic
 void create_entry(char *name, AppState *state)
 {
     int name_len = strlen(name);

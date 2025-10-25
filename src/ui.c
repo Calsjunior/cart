@@ -214,6 +214,18 @@ static void draw_keymap_help(void)
     const char *action = "Action: ";
     mvwprintw(key_help, 10, left_align_cols, "%s", action);
 
+    const char *create_entry = "a  -  Create file/folder";
+    int create_entry_cols = center_text_menu(width, create_entry);
+    mvwprintw(key_help, 11, create_entry_cols, "%s", create_entry);
+
+    const char *delete_entry = "d  -  Delete file/folder";
+    int delete_entry_cols = center_text_menu(width, delete_entry);
+    mvwprintw(key_help, 12, delete_entry_cols, "%s", delete_entry);
+
+    const char *open_entry = "v  -  Open file/folder";
+    int open_entry_cols = center_text_menu(width, open_entry);
+    mvwprintw(key_help, 13, delete_entry_cols, "%s", open_entry);
+
     const char *quit = "q - Quit";
     int quit_cols = center_text_menu(width, quit);
     mvwprintw(key_help, height - 2, quit_cols, "%s", quit);
