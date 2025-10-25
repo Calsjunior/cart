@@ -252,13 +252,13 @@ static void draw_create_entry_prompt(AppState *state)
 {
     int height, width, start_rows, start_cols;
     height = max_rows / 5;
-    width = max_cols / 3;
+    width = max_cols / 2;
     start_rows = (max_rows - height) / 4;
     start_cols = (max_cols - width) / 2;
     WINDOW *creationwin = newwin(height, width, start_rows, start_cols);
     refresh();
 
-    const char *create_entry = "Add new file to the current working directory";
+    const char *create_entry = "Add new file to the current working directory (directory ends with '/')";
     int create_entry_cols = center_text_menu(width, create_entry);
     mvwprintw(creationwin, 1, create_entry_cols, "%s", create_entry);
 
