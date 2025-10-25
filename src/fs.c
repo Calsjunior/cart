@@ -269,9 +269,11 @@ void create_entry(char *name, AppState *state)
     char full_path[PATH_MAX];
     helper_set_full_path(full_path, sizeof(full_path), name, state);
 
+    bool is_a_directory = false;
     if (name_len > 0 && name[name_len - 1] == '/')
     {
         mkdir(full_path, 0777);
+        is_a_directory = true;
     }
     else
     {
@@ -286,6 +288,11 @@ void create_entry(char *name, AppState *state)
     if (state->cursor_name != NULL)
     {
         free(state->cursor_name);
+    }
+
+    if (is_a_directory)
+    {
+        name[name_len - 1] = '\0';
     }
     state->cursor_name = strdup(name);
     state->scroll_offset = 0;
