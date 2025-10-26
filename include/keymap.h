@@ -13,13 +13,13 @@ typedef enum
     MOVE_DOWN_ALL,
     MOVE_LEFT,
     MOVE_RIGHT,
-    SELECT,
     DELETE,
     CONFIRM_YES,
     CONFIRM_NO,
     OPEN,
     CREATE,
     RESIZE,
+    TOGGLE_HIDDEN,
     KEYMAP_HELP,
     QUIT
 } Action;

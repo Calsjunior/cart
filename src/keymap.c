@@ -12,6 +12,8 @@ Action get_action(int ch)
             return KEYMAP_HELP;
         case KEY_RESIZE:
             return RESIZE;
+        case '.':
+            return TOGGLE_HIDDEN;
 
         // Navigation Keys
         case KEY_UP:

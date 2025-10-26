@@ -40,6 +40,11 @@ void list_dir(AppState *state, EntryList *list)
             continue;
         }
 
+        if (!state->show_hidden && dir_entry->d_name[0] == '.')
+        {
+            continue;
+        }
+
         EntryType type;
         if (dir_entry->d_type == DT_DIR)
         {
@@ -195,9 +200,13 @@ void delete_entry(AppState *state, EntryList *list)
     {
         state->cursor_name = strdup(list->cursor->next->name);
     }
-    else
+    else if (list->cursor->next == NULL && list->cursor->prev == NULL)
     {
         state->cursor_name = NULL;
+    }
+    else if (list->cursor->next == NULL)
+    {
+        state->cursor_name = strdup(list->cursor->prev->name);
     }
 
     char full_path[PATH_MAX];
@@ -266,11 +275,11 @@ void create_entry(char *name, AppState *state)
     char full_path[PATH_MAX];
     helper_set_full_path(full_path, sizeof(full_path), name, state);
 
-    bool is_a_directory = false;
+    bool is_directory = false;
     if (name_len > 0 && name[name_len - 1] == '/')
     {
         mkdir(full_path, 0777);
-        is_a_directory = true;
+        is_directory = true;
     }
     else
     {
@@ -287,7 +296,7 @@ void create_entry(char *name, AppState *state)
         free(state->cursor_name);
     }
 
-    if (is_a_directory)
+    if (is_directory)
     {
         name[name_len - 1] = '\0';
     }
@@ -327,7 +336,7 @@ static void add_entry_node(char *name, EntryType type, EntryList *list)
         }
 
         // If same type then sort in alphabetical order
-        else if (node->type == current->type && strcmp(node->name, current->name) < 0)
+        else if (node->type == current->type && strcasecmp(node->name, current->name) < 0)
         {
             insert_before = TRUE;
         }
