@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "fs.h"
+#include "icon.h"
 #include "keymap.h"
 #include "state.h"
 #include "ui.h"
@@ -155,11 +156,11 @@ static void draw_file_browser(AppState *state, EntryList *list)
 
         if (current->type == ENTRY_DIR)
         {
-            mvprintw(row, 2, "   %s", current->name);
+            mvprintw(row, 2, " %s%s", get_file_icon(current->name, ENTRY_DIR), current->name);
         }
         else
         {
-            mvprintw(row, 2, "   %s", current->name);
+            mvprintw(row, 2, " %s%s", get_file_icon(current->name, ENTRY_FILE), current->name);
         }
 
         attroff(A_REVERSE);
@@ -408,6 +409,17 @@ static void handle_normal_mode(Action key, AppState *state, Stack *stack, EntryL
             state->mode = MODE_PROMPT;
             state->prompt_type = PROMPT_CREATE;
             break;
+
+        case TOGGLE_HIDDEN:
+            if (state->show_hidden)
+            {
+                state->show_hidden = false;
+            }
+            else
+            {
+                state->show_hidden = true;
+            }
+            state->refresh = true;
     }
 }
 
