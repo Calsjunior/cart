@@ -54,10 +54,9 @@ void init_ui(void)
         init_pair(6, COLOR_MAGENTA, -1);
         init_pair(7, COLOR_CYAN, -1);
         init_pair(8, COLOR_WHITE, -1);
-
         init_pair(9, -1, COLOR_BLACK);
-
         init_pair(10, COLOR_BLACK, COLOR_GREEN);
+        init_pair(11, COLOR_WHITE, COLOR_BLACK);
     }
 }
 
@@ -236,6 +235,29 @@ static void draw_status_line(AppState *state, EntryList *list)
     attron(COLOR_PAIR(10) | A_BOLD);
     mvprintw(status_row, right_x, "%s", right_buffer);
     attroff(COLOR_PAIR(10) | A_BOLD);
+
+    // Display the percentage section
+    char pos_percent[10];
+    char *pos_top = "Top";
+    char *pos_bottom = "Bot";
+    float percent = (float) cursor_position / list->count_entries * 100;
+    if (list->cursor == list->head)
+    {
+        snprintf(pos_percent, sizeof(pos_percent), "%s ", pos_top);
+    }
+    else if (list->cursor == list->tail)
+    {
+        snprintf(pos_percent, sizeof(pos_percent), "%s ", pos_bottom);
+    }
+    else
+    {
+        snprintf(pos_percent, sizeof(pos_percent), "%-2.0f%% ", percent);
+    }
+    right_x = right_x - strlen(pos_percent);
+
+    attron(COLOR_PAIR(11) | A_BOLD);
+    mvprintw(status_row, right_x, "%s", pos_percent);
+    attroff(COLOR_PAIR(11) | A_BOLD);
 }
 
 // TODO: fix these disguisting UI madness
