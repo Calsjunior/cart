@@ -10,6 +10,7 @@
 #include "ui.h"
 
 static void draw_file_browser(AppState *state, EntryList *list);
+static void draw_status_line(AppState *state, EntryList *list);
 static void draw_keymap_help(void);
 static void draw_delete_entry_prompt(EntryList *list);
 static void draw_create_entry_prompt(AppState *state);
@@ -23,6 +24,7 @@ static void handle_prompt_mode(Action key, AppState *state, Stack *stack, EntryL
 static void helper_set_mode_normal(AppState *state);
 
 static int center_text_menu(int width, const char *text);
+static void truncate_middle(char *dest, size_t dest_size, const char *src, int max_width);
 
 static void do_resize(void);
 
@@ -44,7 +46,18 @@ void init_ui(void)
         start_color();
         use_default_colors();
 
-        init_pair(1, COLOR_CYAN, -1);
+        init_pair(1, COLOR_BLACK, -1);
+        init_pair(2, COLOR_RED, -1);
+        init_pair(3, COLOR_GREEN, -1);
+        init_pair(4, COLOR_YELLOW, -1);
+        init_pair(5, COLOR_BLUE, -1);
+        init_pair(6, COLOR_MAGENTA, -1);
+        init_pair(7, COLOR_CYAN, -1);
+        init_pair(8, COLOR_WHITE, -1);
+
+        init_pair(9, -1, COLOR_BLACK);
+
+        init_pair(10, COLOR_BLACK, COLOR_GREEN);
     }
 }
 
@@ -168,15 +181,61 @@ static void draw_file_browser(AppState *state, EntryList *list)
         entry_index++;
     }
 
-    for (int i = 0; i < max_cols; i++)
-    {
-        mvaddch(max_rows - 2, i, ACS_HLINE);
-    }
-
-    int cursor_position = get_cursor_position(list);
-    mvprintw(max_rows - 1, 0, "Entries: %d | Position: %d | Keymaps: (?)", list->count_entries, cursor_position + 1);
+    draw_status_line(state, list);
 
     refresh();
+}
+
+static void draw_status_line(AppState *state, EntryList *list)
+{
+    int status_row = max_rows - 1;
+    int current_x = 0;
+
+    // Print the bar
+    attron(COLOR_PAIR(1) | A_REVERSE);
+    move(status_row, current_x);
+    for (int i = 0; i < max_cols; i++)
+    {
+        addch(' ');
+    }
+    attroff(COLOR_PAIR(1) | A_REVERSE);
+
+    // Left section
+    char *mode_str;
+    if (state->mode == MODE_NORMAL)
+    {
+        mode_str = "NORMAL";
+    }
+    else
+    {
+        mode_str = "PROMPT";
+    }
+    attron(COLOR_PAIR(10) | A_BOLD);
+    mvprintw(status_row, current_x, " %-7s", mode_str);
+    attroff(COLOR_PAIR(10) | A_BOLD);
+
+    current_x = strlen(mode_str);
+
+    if (list->cursor == NULL)
+    {
+        return;
+    }
+    int str_width = 30;
+    char filename[str_width];
+    truncate_middle(filename, sizeof(filename), list->cursor->name, str_width);
+    attron(COLOR_PAIR(9));
+    mvprintw(status_row, current_x + 3, "%s", filename);
+    attroff(COLOR_PAIR(9));
+
+    // Right section
+    char right_buffer[128];
+    int cursor_position = get_cursor_position(list) + 1;
+    snprintf(right_buffer, sizeof(right_buffer), "%4d/%-4d", cursor_position, list->count_entries);
+    int right_x = max_cols - strlen(right_buffer);
+
+    attron(COLOR_PAIR(10) | A_BOLD);
+    mvprintw(status_row, right_x, "%s", right_buffer);
+    attroff(COLOR_PAIR(10) | A_BOLD);
 }
 
 // TODO: fix these disguisting UI madness
@@ -472,6 +531,31 @@ static void helper_set_mode_normal(AppState *state)
 static int center_text_menu(int width, const char *text)
 {
     return (width - strlen(text)) / 2;
+}
+
+static void truncate_middle(char *dest, size_t dest_size, const char *src, int max_width)
+{
+    int src_len = strlen(src);
+
+    if (src_len <= max_width)
+    {
+        snprintf(dest, dest_size, "%s", src);
+        return;
+    }
+
+    int left_len = (max_width - 3) / 2;
+    int right_len = max_width - 3 - left_len;
+
+    if (left_len > src_len)
+    {
+        left_len = src_len;
+    }
+    if (right_len > src_len)
+    {
+        right_len = src_len;
+    }
+
+    snprintf(dest, dest_size, "%.*s…%.*s", left_len, src, right_len, src + src_len - right_len);
 }
 
 static void do_resize(void)
