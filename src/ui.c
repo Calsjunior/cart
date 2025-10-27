@@ -386,6 +386,11 @@ static void handle_normal_mode(Action key, AppState *state, Stack *stack, EntryL
             if (list->cursor != NULL && list->cursor->prev != NULL)
             {
                 list->cursor = list->cursor->prev;
+                return;
+            }
+            if (list->cursor != NULL && list->cursor->prev == NULL)
+            {
+                list->cursor = list->tail;
             }
             break;
 
@@ -393,6 +398,11 @@ static void handle_normal_mode(Action key, AppState *state, Stack *stack, EntryL
             if (list->cursor != NULL && list->cursor->next != NULL)
             {
                 list->cursor = list->cursor->next;
+                return;
+            }
+            if (list->cursor != NULL && list->cursor->next == NULL)
+            {
+                list->cursor = list->head;
             }
             break;
 
