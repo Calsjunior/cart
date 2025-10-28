@@ -46,11 +46,7 @@ void init_ui(void)
 
 void draw_ui(AppState *state, EntryList *list)
 {
-    if (state->mode == MODE_NORMAL)
-    {
-        draw_file_browser(state, list);
-        return;
-    }
+    draw_file_browser(state, list);
 
     if (state->mode == MODE_PROMPT)
     {
@@ -71,6 +67,8 @@ void draw_ui(AppState *state, EntryList *list)
                 break;
         }
     }
+
+    draw_status_line(state, list);
 }
 
 void handle_input(Action key, AppState *state, Stack *stack, EntryList *list)
@@ -164,8 +162,6 @@ static void draw_file_browser(AppState *state, EntryList *list)
         entry_index++;
     }
 
-    draw_status_line(state, list);
-
     refresh();
 }
 
@@ -199,6 +195,11 @@ static void draw_status_line(AppState *state, EntryList *list)
 
     current_x = strlen(mode_str);
 
+    // Separator
+    apply_color(THEME_STATUS_SEPARATOR);
+    mvprintw(status_row, current_x + 2, "");
+    unapply_color(THEME_STATUS_SEPARATOR);
+
     if (list->cursor == NULL)
     {
         return;
@@ -207,7 +208,7 @@ static void draw_status_line(AppState *state, EntryList *list)
     char filename[str_width];
     truncate_middle(filename, sizeof(filename), list->cursor->name, str_width);
     apply_color(THEME_STATUS_INFO);
-    mvprintw(status_row, current_x + 3, "%s", filename);
+    mvprintw(status_row, current_x + 3, " %s", filename);
     unapply_color(THEME_STATUS_INFO);
 
     // Right section
@@ -219,6 +220,10 @@ static void draw_status_line(AppState *state, EntryList *list)
     apply_color(THEME_STATUS_POSITION);
     mvprintw(status_row, right_x, "%s", right_buffer);
     unapply_color(THEME_STATUS_POSITION);
+
+    apply_color(THEME_STATUS_SEPARATOR);
+    mvprintw(status_row, right_x, "");
+    unapply_color(THEME_STATUS_SEPARATOR);
 
     // Display the percentage section
     char pos_percent[10];
@@ -239,9 +244,9 @@ static void draw_status_line(AppState *state, EntryList *list)
     }
     right_x = right_x - strlen(pos_percent);
 
-    apply_color(THEME_STATUS_INFO);
+    apply_color(THEME_STATUS_PERCENT);
     mvprintw(status_row, right_x, "%s", pos_percent);
-    unapply_color(THEME_STATUS_INFO);
+    unapply_color(THEME_STATUS_PERCENT);
 }
 
 // TODO: fix these disguisting UI madness
