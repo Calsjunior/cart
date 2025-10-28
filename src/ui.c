@@ -3,6 +3,7 @@
 #include <ncurses.h>
 #include <string.h>
 
+#include "colors.h"
 #include "fs.h"
 #include "icon.h"
 #include "keymap.h"
@@ -40,24 +41,7 @@ void init_ui(void)
     keypad(stdscr, TRUE); // Enable special keys like arrow keys
     halfdelay(TRUE);
     getmaxyx(stdscr, max_rows, max_cols);
-
-    if (has_colors())
-    {
-        start_color();
-        use_default_colors();
-
-        init_pair(1, COLOR_BLACK, -1);
-        init_pair(2, COLOR_RED, -1);
-        init_pair(3, COLOR_GREEN, -1);
-        init_pair(4, COLOR_YELLOW, -1);
-        init_pair(5, COLOR_BLUE, -1);
-        init_pair(6, COLOR_MAGENTA, -1);
-        init_pair(7, COLOR_CYAN, -1);
-        init_pair(8, COLOR_WHITE, -1);
-        init_pair(9, -1, COLOR_BLACK);
-        init_pair(10, COLOR_BLACK, COLOR_GREEN);
-        init_pair(11, COLOR_WHITE, COLOR_BLACK);
-    }
+    init_colors(); // From "colors.h"
 }
 
 void draw_ui(AppState *state, EntryList *list)
@@ -191,13 +175,13 @@ static void draw_status_line(AppState *state, EntryList *list)
     int current_x = 0;
 
     // Print the bar
-    attron(COLOR_PAIR(1) | A_REVERSE);
+    apply_color(THEME_STATUS_BAR);
     move(status_row, current_x);
     for (int i = 0; i < max_cols; i++)
     {
         addch(' ');
     }
-    attroff(COLOR_PAIR(1) | A_REVERSE);
+    unapply_color(THEME_STATUS_BAR);
 
     // Left section
     char *mode_str;
@@ -209,9 +193,9 @@ static void draw_status_line(AppState *state, EntryList *list)
     {
         mode_str = "PROMPT";
     }
-    attron(COLOR_PAIR(10) | A_BOLD);
+    apply_color(THEME_STATUS_MODE);
     mvprintw(status_row, current_x, " %-7s", mode_str);
-    attroff(COLOR_PAIR(10) | A_BOLD);
+    unapply_color(THEME_STATUS_MODE);
 
     current_x = strlen(mode_str);
 
@@ -222,9 +206,9 @@ static void draw_status_line(AppState *state, EntryList *list)
     int str_width = 30;
     char filename[str_width];
     truncate_middle(filename, sizeof(filename), list->cursor->name, str_width);
-    attron(COLOR_PAIR(9));
+    apply_color(THEME_STATUS_INFO);
     mvprintw(status_row, current_x + 3, "%s", filename);
-    attroff(COLOR_PAIR(9));
+    unapply_color(THEME_STATUS_INFO);
 
     // Right section
     char right_buffer[128];
@@ -232,9 +216,9 @@ static void draw_status_line(AppState *state, EntryList *list)
     snprintf(right_buffer, sizeof(right_buffer), "%4d/%-4d", cursor_position, list->count_entries);
     int right_x = max_cols - strlen(right_buffer);
 
-    attron(COLOR_PAIR(10) | A_BOLD);
+    apply_color(THEME_STATUS_POSITION);
     mvprintw(status_row, right_x, "%s", right_buffer);
-    attroff(COLOR_PAIR(10) | A_BOLD);
+    unapply_color(THEME_STATUS_POSITION);
 
     // Display the percentage section
     char pos_percent[10];
@@ -255,9 +239,9 @@ static void draw_status_line(AppState *state, EntryList *list)
     }
     right_x = right_x - strlen(pos_percent);
 
-    attron(COLOR_PAIR(11) | A_BOLD);
+    apply_color(THEME_STATUS_INFO);
     mvprintw(status_row, right_x, "%s", pos_percent);
-    attroff(COLOR_PAIR(11) | A_BOLD);
+    unapply_color(THEME_STATUS_INFO);
 }
 
 // TODO: fix these disguisting UI madness

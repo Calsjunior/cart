@@ -5,6 +5,8 @@ static ColorPairs color_scheme[] = {
     // UI
     {THEME_STATUS_BAR, COLOR_DEFAULT, COLOR_FG_BLACK, 0},
     {THEME_STATUS_MODE, COLOR_FG_BLACK, COLOR_FG_GREEN, A_BOLD},
+    {THEME_STATUS_INFO, COLOR_DEFAULT, COLOR_FG_BLACK, A_BOLD},
+    {THEME_STATUS_POSITION, COLOR_FG_BLACK, COLOR_FG_GREEN, A_BOLD},
 };
 
 static int num_colors = sizeof(color_scheme) / sizeof(color_scheme[0]);

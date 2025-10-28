@@ -28,7 +28,7 @@ typedef enum
 typedef enum
 {
     // UI
-    THEME_STATUS_BAR,
+    THEME_STATUS_BAR = 1,
     THEME_STATUS_MODE,
     THEME_STATUS_INFO,
     THEME_STATUS_POSITION,

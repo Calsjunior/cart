@@ -1,8 +1,7 @@
-#include "icon.h"
-#include <stddef.h>
 #include <string.h>
 
 #include "fs.h"
+#include "icon.h"
 
 static EntryTypeExt ext_list[] = {
 
