@@ -1,4 +1,3 @@
-#include <stddef.h>
 #define _XOPEN_SOURCE 700
 #define _DARWIN_C_SOURCE
 #define _DEFAULT_SOURCE
@@ -6,8 +5,10 @@
 #include <dirent.h>
 #include <ftw.h>
 #include <ncurses.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 #include "fs.h"
@@ -45,16 +46,25 @@ void list_dir(AppState *state, EntryList *list)
             continue;
         }
 
+        char full_path[PATH_MAX];
+        helper_set_full_path(full_path, sizeof(full_path), dir_entry->d_name, state);
+
+        struct stat entry_stat;
+        if (lstat(full_path, &entry_stat) < 0)
+        {
+            continue;
+        }
+
         EntryType type;
-        if (dir_entry->d_type == DT_DIR)
+        if (S_ISDIR(entry_stat.st_mode))
         {
             type = ENTRY_DIR;
         }
-        else if (dir_entry->d_type == DT_REG)
+        else if (S_ISREG(entry_stat.st_mode))
         {
             type = ENTRY_FILE;
         }
-        else if (dir_entry->d_type == DT_UNKNOWN)
+        else
         {
             continue;
         }
