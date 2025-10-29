@@ -11,6 +11,7 @@
 #include "ui.h"
 
 static void draw_file_browser(AppState *state, EntryList *list);
+static void draw_path_line(AppState *state);
 static void draw_status_line(AppState *state, EntryList *list);
 static void draw_keymap_help(void);
 static void draw_delete_entry_prompt(EntryList *list);
@@ -67,8 +68,6 @@ void draw_ui(AppState *state, EntryList *list)
                 break;
         }
     }
-
-    draw_status_line(state, list);
 }
 
 void handle_input(Action key, AppState *state, Stack *stack, EntryList *list)
@@ -112,16 +111,10 @@ void clean_ui()
 static void draw_file_browser(AppState *state, EntryList *list)
 {
     clear();
-
-    mvprintw(0, 0, "Path: %s", state->dir_path);
-
-    for (int i = 0; i < max_cols; i++)
-    {
-        mvaddch(1, i, ACS_HLINE);
-    }
+    draw_path_line(state);
 
     // Calculate visible space (between top path and bottom status)
-    int visible_lines = max_rows - 4; // -2 for path bar, -2 for status bar
+    int visible_lines = max_rows - 3; // -2 for path bar, -1 for status bar
 
     adjust_scroll(visible_lines, list);
 
@@ -138,7 +131,7 @@ static void draw_file_browser(AppState *state, EntryList *list)
         }
 
         // Stop drawing if filled the visible area
-        if (row >= max_rows - 2)
+        if (row >= max_rows)
         {
             break;
         }
@@ -150,11 +143,11 @@ static void draw_file_browser(AppState *state, EntryList *list)
 
         if (current->type == ENTRY_DIR)
         {
-            mvprintw(row, 2, " %s%s", get_file_icon(current->name, ENTRY_DIR), current->name);
+            mvprintw(row, 1, " %s%s", get_file_icon(current->name, ENTRY_DIR), current->name);
         }
         else
         {
-            mvprintw(row, 2, " %s%s", get_file_icon(current->name, ENTRY_FILE), current->name);
+            mvprintw(row, 1, " %s%s", get_file_icon(current->name, ENTRY_FILE), current->name);
         }
 
         attroff(A_REVERSE);
@@ -162,7 +155,20 @@ static void draw_file_browser(AppState *state, EntryList *list)
         entry_index++;
     }
 
+    draw_status_line(state, list);
     refresh();
+}
+
+static void draw_path_line(AppState *state)
+{
+    int path_row = 0;
+    mvprintw(path_row, 0, " %s", state->dir_path);
+    apply_color(THEME_PATH_LINE);
+    for (int i = 0; i < max_cols; i++)
+    {
+        mvaddch(path_row + 1, i, ACS_HLINE);
+    }
+    unapply_color(THEME_PATH_LINE);
 }
 
 static void draw_status_line(AppState *state, EntryList *list)
@@ -171,13 +177,12 @@ static void draw_status_line(AppState *state, EntryList *list)
     int current_x = 0;
 
     // Print the bar
-    apply_color(THEME_STATUS_BAR);
-    move(status_row, current_x);
+    apply_color(THEME_STATUS_LINE);
     for (int i = 0; i < max_cols; i++)
     {
-        addch(' ');
+        mvaddch(status_row, i, ' ');
     }
-    unapply_color(THEME_STATUS_BAR);
+    unapply_color(THEME_STATUS_LINE);
 
     // Left section
     char *mode_str;
@@ -443,7 +448,7 @@ static void handle_normal_mode(Action key, AppState *state, Stack *stack, EntryL
             break;
 
         case MOVE_UP_HALF:
-            for (int i = 0; i < list->count_entries / 2; i++)
+            for (int i = 0; i < max_rows / 2; i++)
             {
                 if (list->cursor != NULL && list->cursor->prev != NULL)
                 {
@@ -453,7 +458,7 @@ static void handle_normal_mode(Action key, AppState *state, Stack *stack, EntryL
             break;
 
         case MOVE_DOWN_HALF:
-            for (int i = 0; i < list->count_entries / 2; i++)
+            for (int i = 0; i < max_rows / 2; i++)
             {
                 if (list->cursor != NULL && list->cursor->next != NULL)
                 {
