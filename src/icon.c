@@ -1,7 +1,3 @@
-#include <string.h>
-
-#include "colors.h"
-#include "fs.h"
 #include "icon.h"
 
 static EntryTypeExt ext_list[] = {

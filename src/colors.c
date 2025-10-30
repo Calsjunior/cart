@@ -1,5 +1,4 @@
 #include "colors.h"
-#include <ncurses.h>
 
 static ColorPairs color_scheme[] = {
     // UI

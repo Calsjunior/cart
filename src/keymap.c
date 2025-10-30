@@ -1,5 +1,3 @@
-#include <ncurses.h>
-
 #include "keymap.h"
 
 Action get_action(int ch)

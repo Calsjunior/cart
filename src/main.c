@@ -1,10 +1,7 @@
 #define _DEFAULT_SOURCE
 
-#include <dirent.h>
 #include <locale.h>
 #include <ncurses.h>
-#include <stdlib.h>
-#include <string.h>
 
 #include "fs.h"
 #include "keymap.h"

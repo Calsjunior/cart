@@ -1,18 +1,4 @@
-#define _XOPEN_SOURCE 700
-#define _DARWIN_C_SOURCE
-#define _DEFAULT_SOURCE
-
-#include <dirent.h>
-#include <ftw.h>
-#include <ncurses.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <unistd.h>
-
 #include "fs.h"
-#include "state.h"
 
 static void add_entry_node(char *name, EntryType type, EntryList *list);
 static void delete_directory_recursively(const char *path);

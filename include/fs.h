@@ -1,7 +1,18 @@
 #ifndef FS_H
 #define FS_H
 
+#define _XOPEN_SOURCE 700
+#define _DARWIN_C_SOURCE
+#define _DEFAULT_SOURCE
+
+#include <dirent.h>
+#include <ftw.h>
+#include <ncurses.h>
+#include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include "state.h"
 

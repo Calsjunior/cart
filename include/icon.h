@@ -1,6 +1,8 @@
 #ifndef ICON_H
 #define ICON_H
 
+#include <string.h>
+
 #include "colors.h"
 #include "fs.h"
 

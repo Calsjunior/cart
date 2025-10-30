@@ -1,15 +1,3 @@
-#define _XOPEN_SOURCE 700
-#define _DEFAUT_SOURCE
-
-#include <ncurses.h>
-#include <string.h>
-#include <unistd.h>
-
-#include "colors.h"
-#include "fs.h"
-#include "icon.h"
-#include "keymap.h"
-#include "state.h"
 #include "ui.h"
 
 static void draw_file_browser(AppState *state, EntryList *list);
@@ -116,11 +104,11 @@ static void draw_file_browser(AppState *state, EntryList *list)
     draw_path_line(state);
 
     // Calculate visible space (between top path and bottom status)
-    int visible_lines = max_rows - 3; // -2 for path bar, -1 for status bar
+    int visible_lines = max_rows - PATH_LINE - STATUS_LINE; // -2 for path bar, -1 for status bar
 
     adjust_scroll(visible_lines, list);
 
-    int row = 2;
+    int row = SCROLL_PADDING;
     int entry_index = 0;
 
     for (EntryNode *current = list->head; current != NULL; current = current->next)
@@ -201,7 +189,7 @@ static void draw_status_line(AppState *state, EntryList *list)
     }
     unapply_color(THEME_STATUS_LINE);
 
-    // Left section
+    /* Left section */
     char *mode_str;
     if (state->mode == MODE_NORMAL)
     {
@@ -222,6 +210,7 @@ static void draw_status_line(AppState *state, EntryList *list)
     mvprintw(status_row, current_x + 2, "");
     unapply_color(THEME_STATUS_SEPARATOR);
 
+    // Filename
     if (list->cursor == NULL)
     {
         return;
@@ -233,7 +222,7 @@ static void draw_status_line(AppState *state, EntryList *list)
     mvprintw(status_row, current_x + 3, " %s", filename);
     unapply_color(THEME_STATUS_INFO);
 
-    // Right section
+    /* Right section */
     char right_buffer[128];
     int cursor_position = get_cursor_position(list) + 1;
     snprintf(right_buffer, sizeof(right_buffer), "%4d/%-4d", cursor_position, list->count_entries);

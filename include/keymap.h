@@ -1,6 +1,8 @@
 #ifndef KEYMAP_H
 #define KEYMAP_H
 
+#include <ncurses.h>
+
 #define CTRL(x) ((x) & 0x1f)
 
 typedef enum
