@@ -138,19 +138,17 @@ static void draw_file_browser(AppState *state, EntryList *list)
 
         if (current == list->cursor)
         {
-            attron(A_REVERSE);
+            apply_color(THEME_SELECTED);
         }
 
-        if (current->type == ENTRY_DIR)
-        {
-            mvprintw(row, 1, " %s%s", get_file_icon(current->name, ENTRY_DIR), current->name);
-        }
-        else
-        {
-            mvprintw(row, 1, " %s%s", get_file_icon(current->name, ENTRY_FILE), current->name);
-        }
+        const char *icon = get_entry_icon(current->name, current->type);
+        ThemeColor color = get_entry_color(current->name, current->type);
 
-        attroff(A_REVERSE);
+        mvprintw(row, 1, " %s", icon);
+
+        mvprintw(row, 3, " %s", current->name);
+
+        unapply_color(THEME_SELECTED);
         row++;
         entry_index++;
     }

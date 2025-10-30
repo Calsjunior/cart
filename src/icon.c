@@ -1,5 +1,6 @@
 #include <string.h>
 
+#include "colors.h"
 #include "fs.h"
 #include "icon.h"
 
@@ -22,7 +23,7 @@ static EntryTypeExt ext_list[] = {
     {".mov", " "},
 
     // Languages
-    {".c", "󰙱 "},
+    {".c", "󰙱 ", THEME_CODE_C},
     {".cpp", "󰙲 "},
     {".py", " "},
     {".sh", " "},
@@ -43,14 +44,14 @@ static EntryTypeExt ext_list[] = {
 
 static int num_ext_type = sizeof(ext_list) / sizeof(ext_list[0]);
 
-const char *get_file_icon(const char *filename, EntryType type)
+const char *get_entry_icon(const char *entryname, EntryType type)
 {
     if (type == ENTRY_DIR)
     {
         return "󰉋 ";
     }
 
-    const char *ext = strrchr(filename, '.');
+    const char *ext = strrchr(entryname, '.');
     if (ext == NULL)
     {
         return " ";
@@ -65,4 +66,27 @@ const char *get_file_icon(const char *filename, EntryType type)
     }
 
     return " ";
+}
+
+ThemeColor get_entry_color(const char *entryname, EntryType type)
+{
+    if (type == ENTRY_DIR)
+    {
+        return THEME_DIR;
+    }
+
+    const char *ext = strrchr(entryname, '.');
+    if (ext == NULL)
+    {
+        return THEME_FILE;
+    }
+
+    for (int i = 0; i < num_ext_type; i++)
+    {
+        if (strcmp(ext, ext_list[i].extension) == 0)
+        {
+            return ext_list[i].color;
+        }
+    }
+    return THEME_FILE;
 }

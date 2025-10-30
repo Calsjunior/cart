@@ -36,6 +36,16 @@ typedef enum
     THEME_STATUS_POSITION,
     THEME_STATUS_POSITION_SEPARATOR,
     THEME_STATUS_PERCENT,
+
+    // Browser colors
+    THEME_DIR,
+    THEME_FILE,
+
+    // File extension colors
+    THEME_CODE_C,
+
+    // Selection
+    THEME_SELECTED,
 } ThemeColor;
 
 typedef struct

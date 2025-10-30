@@ -10,6 +10,16 @@ static ColorPairs color_scheme[] = {
     {THEME_STATUS_INFO, COLOR_DEFAULT, COLOR_FG_BLACK, A_BOLD},
     {THEME_STATUS_POSITION, COLOR_FG_BLACK, COLOR_FG_GREEN, A_BOLD},
     {THEME_STATUS_PERCENT, COLOR_FG_WHITE, COLOR_BLACK, A_BOLD},
+
+    // Browser
+    {THEME_DIR, COLOR_FG_BLUE, COLOR_DEFAULT, 0},
+    {THEME_FILE, COLOR_DEFAULT, COLOR_DEFAULT, 0},
+
+    // File extension
+    {THEME_CODE_C, COLOR_FG_BLUE, COLOR_DEFAULT, 0},
+
+    // Selection
+    {THEME_SELECTED, COLOR_DEFAULT, COLOR_DEFAULT, A_REVERSE},
 };
 
 static int num_colors = sizeof(color_scheme) / sizeof(color_scheme[0]);
