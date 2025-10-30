@@ -51,6 +51,16 @@ const char *get_entry_icon(const char *entryname, EntryType type)
         return "󰉋 ";
     }
 
+    if (type == ENTRY_SYMLINK_DIR)
+    {
+        return " ";
+    }
+
+    if (type == ENTRY_SYMLINK_FILE)
+    {
+        return " ";
+    }
+
     const char *ext = strrchr(entryname, '.');
     if (ext == NULL)
     {

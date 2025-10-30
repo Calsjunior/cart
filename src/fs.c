@@ -50,6 +50,7 @@ void list_dir(AppState *state, EntryList *list)
         helper_set_full_path(full_path, sizeof(full_path), dir_entry->d_name, state);
 
         struct stat entry_stat;
+        struct stat target_stat;
         if (lstat(full_path, &entry_stat) < 0)
         {
             continue;
@@ -64,9 +65,21 @@ void list_dir(AppState *state, EntryList *list)
         {
             type = ENTRY_FILE;
         }
-        else
+        else if (S_ISLNK(entry_stat.st_mode))
         {
-            continue;
+            if (stat(full_path, &target_stat) < 0)
+            {
+                continue;
+            }
+
+            if (S_ISDIR(target_stat.st_mode))
+            {
+                type = ENTRY_SYMLINK_DIR;
+            }
+            else if (S_ISREG(target_stat.st_mode))
+            {
+                type = ENTRY_SYMLINK_FILE;
+            }
         }
         add_entry_node(dir_entry->d_name, type, list);
         list->count_entries++;
@@ -339,14 +352,18 @@ static void add_entry_node(char *name, EntryType type, EntryList *list)
     {
         bool insert_before = FALSE;
 
+        // Determine if entry is folder or files
+        bool node_is_dir = (node->type == ENTRY_DIR || node->type == ENTRY_SYMLINK_DIR);
+        bool current_is_dir = (current->type == ENTRY_DIR || current->type == ENTRY_SYMLINK_DIR);
+
         // Sort directory before file
-        if (node->type == ENTRY_DIR && current->type == ENTRY_FILE)
+        if (node_is_dir && !current_is_dir)
         {
             insert_before = TRUE;
         }
 
         // If same type then sort in alphabetical order
-        else if (node->type == current->type && strcasecmp(node->name, current->name) < 0)
+        else if (node_is_dir == current_is_dir && strcasecmp(node->name, current->name) < 0)
         {
             insert_before = TRUE;
         }

@@ -9,7 +9,9 @@
 typedef enum
 {
     ENTRY_DIR,
-    ENTRY_FILE
+    ENTRY_FILE,
+    ENTRY_SYMLINK_DIR,
+    ENTRY_SYMLINK_FILE,
 } EntryType;
 
 typedef struct EntryNode

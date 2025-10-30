@@ -437,7 +437,7 @@ static void handle_normal_mode(Action key, AppState *state, Stack *stack, EntryL
             break;
 
         case MOVE_RIGHT:
-            if (list->cursor != NULL && list->cursor->type == ENTRY_DIR)
+            if (list->cursor != NULL && (list->cursor->type == ENTRY_DIR || list->cursor->type == ENTRY_SYMLINK_DIR))
             {
                 subdir_stack_push(state, stack, list);
                 navigate_subdir(state, list);
