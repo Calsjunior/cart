@@ -1,7 +1,9 @@
-#define _DEFAULT_SOURCE
+#define _XOPEN_SOURCE 700
+#define _DEFAUT_SOURCE
 
 #include <ncurses.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "colors.h"
 #include "fs.h"
@@ -146,7 +148,24 @@ static void draw_file_browser(AppState *state, EntryList *list)
 
         mvprintw(row, 1, " %s", icon);
 
-        mvprintw(row, 3, " %s", current->name);
+        if (current->type == ENTRY_SYMLINK_DIR || current->type == ENTRY_SYMLINK_FILE)
+        {
+            char full_path[PATH_MAX];
+            helper_set_full_path(full_path, sizeof(full_path), current->name, state);
+
+            char target[PATH_MAX];
+            ssize_t len = readlink(full_path, target, sizeof(target) - 1);
+            if (len == -1)
+            {
+                return;
+            }
+            target[len] = '\0';
+            mvprintw(row, 3, " %s -> %s", current->name, target);
+        }
+        else
+        {
+            mvprintw(row, 3, " %s", current->name);
+        }
 
         unapply_color(THEME_SELECTED);
         row++;
