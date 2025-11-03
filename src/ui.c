@@ -3,7 +3,6 @@
 static void draw_file_browser(AppState *state, EntryList *list);
 static void draw_path_line(AppState *state);
 static void draw_status_line(AppState *state, EntryList *list);
-static void draw_keymap_help(void);
 static void draw_delete_entry_prompt(EntryList *list);
 static void draw_create_entry_prompt(AppState *state);
 
@@ -261,60 +260,6 @@ static void draw_status_line(AppState *state, EntryList *list)
 }
 
 // TODO: fix these disguisting UI madness
-static void draw_keymap_help(void)
-{
-    int height, width, start_rows, start_cols;
-    height = max_rows / 2;
-    width = max_cols / 3;
-    start_rows = (max_rows - height) / 2;
-    start_cols = (max_cols - width) / 2;
-    int left_align_cols = 2;
-    WINDOW *key_help = newwin(height, width, start_rows, start_cols);
-    refresh();
-
-    const char *title = "Keymaps";
-    int title_cols = center_text_menu(width, title);
-    mvwprintw(key_help, 1, title_cols, "%s", title);
-
-    const char *nav = "Navigation: ";
-    mvwprintw(key_help, 3, left_align_cols, "%s", nav);
-
-    const char *move_keys = " /   or k/j  -  Move up/down";
-    const char *nav_keys = " /   or h/l  -  Move left/right";
-    int move_keys_cols = center_text_menu(width, move_keys);
-    mvwprintw(key_help, 5, move_keys_cols + 1, "%s", move_keys);
-    mvwprintw(key_help, 6, move_keys_cols + 1, "%s", nav_keys);
-
-    const char *move_half = "PgDn/PgUp or CTRL D/CTRL U  -  Move half up/down";
-    int move_half_cols = center_text_menu(width, move_half);
-    mvwprintw(key_help, 7, move_half_cols, "%s", move_half);
-
-    const char *move_all = "Home/End or g/G  -  Go top/bottom";
-    int move_all_cols = center_text_menu(width, move_all);
-    mvwprintw(key_help, 8, move_all_cols, "%s", move_all);
-
-    const char *action = "Action: ";
-    mvwprintw(key_help, 10, left_align_cols, "%s", action);
-
-    const char *create_entry = "a  -  Create file/folder";
-    int create_entry_cols = center_text_menu(width, create_entry);
-    mvwprintw(key_help, 11, create_entry_cols, "%s", create_entry);
-
-    const char *delete_entry = "d  -  Delete file/folder";
-    int delete_entry_cols = center_text_menu(width, delete_entry);
-    mvwprintw(key_help, 12, delete_entry_cols, "%s", delete_entry);
-
-    const char *open_entry = "v  -  Open file/folder";
-    int open_entry_cols = center_text_menu(width, open_entry);
-    mvwprintw(key_help, 13, delete_entry_cols, "%s", open_entry);
-
-    const char *quit = "q - Quit";
-    int quit_cols = center_text_menu(width, quit);
-    mvwprintw(key_help, height - 2, quit_cols, "%s", quit);
-
-    box(key_help, 0, 0);
-    wrefresh(key_help);
-}
 
 static void draw_delete_entry_prompt(EntryList *list)
 {
