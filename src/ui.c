@@ -3,7 +3,6 @@
 static void draw_file_browser(AppState *state, EntryList *list);
 static void draw_path_line(AppState *state);
 static void draw_status_line(AppState *state, EntryList *list);
-static void draw_delete_entry_prompt(EntryList *list);
 static void draw_create_entry_prompt(AppState *state);
 
 static void adjust_scroll(int visible_lines, EntryList *list);
@@ -13,9 +12,6 @@ static void handle_normal_mode(Action key, AppState *state, Stack *stack, EntryL
 static void handle_prompt_mode(Action key, AppState *state, Stack *stack, EntryList *list);
 
 static void helper_set_mode_normal(AppState *state);
-
-static int center_text_menu(int width, const char *text);
-static void truncate_middle(char *dest, size_t dest_size, const char *src, int max_width);
 
 static void do_resize(void);
 
@@ -47,7 +43,7 @@ void draw_ui(AppState *state, EntryList *list)
                 break;
 
             case PROMPT_DELETE:
-                draw_delete_entry_prompt(list);
+                draw_delete_entry_prompt(state, list);
                 break;
 
             case PROMPT_CREATE:
@@ -103,7 +99,7 @@ static void draw_file_browser(AppState *state, EntryList *list)
     draw_path_line(state);
 
     // Calculate visible space (between top path and bottom status)
-    int visible_lines = max_rows - PATH_LINE - STATUS_LINE; // -2 for path bar, -1 for status bar
+    int visible_lines = max_rows - PATH_LINE - STATUS_LINE;
 
     adjust_scroll(visible_lines, list);
 
@@ -138,7 +134,7 @@ static void draw_file_browser(AppState *state, EntryList *list)
         if (current->type == ENTRY_SYMLINK_DIR || current->type == ENTRY_SYMLINK_FILE)
         {
             char full_path[PATH_MAX];
-            helper_set_full_path(full_path, sizeof(full_path), current->name, state);
+            helper_set_full_path(full_path, sizeof(full_path), state->dir_path, current->name);
 
             char target[PATH_MAX];
             ssize_t len = readlink(full_path, target, sizeof(target) - 1);
@@ -260,33 +256,6 @@ static void draw_status_line(AppState *state, EntryList *list)
 }
 
 // TODO: fix these disguisting UI madness
-
-static void draw_delete_entry_prompt(EntryList *list)
-{
-    int height, width, start_rows, start_cols;
-    height = max_rows / 5;
-    width = max_cols / 4;
-    start_rows = (max_rows - height) / 4;
-    start_cols = (max_cols - width) / 2;
-    WINDOW *deletionwin = newwin(height, width, start_rows, start_cols);
-    refresh();
-
-    const char *delete_confirmation = "Are you sure you want to delete";
-    int delete_confirmation_cols = center_text_menu(width, delete_confirmation);
-    mvwprintw(deletionwin, 1, delete_confirmation_cols, "%s", delete_confirmation);
-
-    int selected_cols = center_text_menu(width, list->cursor->name);
-    mvwprintw(deletionwin, 2, selected_cols, "%s?", list->cursor->name);
-
-    const char *delete_yes = "1. Yes";
-    mvwprintw(deletionwin, 4, 5, "%s", delete_yes);
-
-    mvwprintw(deletionwin, 4, 30, "2. No");
-
-    box(deletionwin, 0, 0);
-    wrefresh(deletionwin);
-}
-
 static void draw_create_entry_prompt(AppState *state)
 {
     int height, width, start_rows, start_cols;
@@ -298,7 +267,7 @@ static void draw_create_entry_prompt(AppState *state)
     refresh();
 
     const char *create_entry = "Add new file to the current working directory (directory ends with '/')";
-    int create_entry_cols = center_text_menu(width, create_entry);
+    int create_entry_cols = width - strlen(create_entry) / 2;
     mvwprintw(creationwin, 1, create_entry_cols, "%s", create_entry);
 
     box(creationwin, 0, 0);
@@ -432,8 +401,11 @@ static void handle_normal_mode(Action key, AppState *state, Stack *stack, EntryL
             break;
 
         case DELETE:
-            state->mode = MODE_PROMPT;
-            state->prompt_type = PROMPT_DELETE;
+            if (list->cursor != NULL)
+            {
+                state->mode = MODE_PROMPT;
+                state->prompt_type = PROMPT_DELETE;
+            }
             break;
 
         case OPEN:
@@ -503,36 +475,6 @@ static void helper_set_mode_normal(AppState *state)
 {
     state->mode = MODE_NORMAL;
     state->prompt_type = PROMPT_NONE;
-}
-
-static int center_text_menu(int width, const char *text)
-{
-    return (width - strlen(text)) / 2;
-}
-
-static void truncate_middle(char *dest, size_t dest_size, const char *src, int max_width)
-{
-    int src_len = strlen(src);
-
-    if (src_len <= max_width)
-    {
-        snprintf(dest, dest_size, "%s", src);
-        return;
-    }
-
-    int left_len = (max_width - 3) / 2;
-    int right_len = max_width - 3 - left_len;
-
-    if (left_len > src_len)
-    {
-        left_len = src_len;
-    }
-    if (right_len > src_len)
-    {
-        right_len = src_len;
-    }
-
-    snprintf(dest, dest_size, "%.*s…%.*s", left_len, src, right_len, src + src_len - right_len);
 }
 
 static void do_resize(void)

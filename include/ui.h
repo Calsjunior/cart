@@ -8,13 +8,15 @@
 #include <unistd.h>
 
 #include "colors.h"
+#include "components/delete.h"
 #include "components/keymap_help.h"
 #include "fs.h"
 #include "icon.h"
 #include "keymap.h"
 #include "state.h"
+#include "text_utils.h"
 
-#define PATH_LINE 1
+#define PATH_LINE 2
 #define STATUS_LINE 1
 #define SCROLL_PADDING 2
 

@@ -15,6 +15,7 @@
 #include <unistd.h>
 
 #include "state.h"
+#include "text_utils.h"
 
 #define PATH_MAX 4096
 
@@ -73,7 +74,5 @@ void navigate_root(AppState *state);
 void delete_entry(AppState *state, EntryList *list);
 void open_entry(AppState *state, EntryList *list);
 void create_entry(char *name, AppState *state);
-
-char *helper_set_full_path(char *buffer, size_t buffer_size, char *name, AppState *state);
 
 #endif

@@ -4,8 +4,6 @@ static void add_entry_node(char *name, EntryType type, EntryList *list);
 static void delete_directory_recursively(const char *path);
 static int remove_callback(const char *path, const struct stat *sb, int typeflag, struct FTW *ftwbuf);
 
-char *helper_set_full_path(char *buffer, size_t buffer_size, char *name, AppState *state);
-
 void list_dir(AppState *state, EntryList *list)
 {
     // Initialize the doubly linked list
@@ -33,7 +31,7 @@ void list_dir(AppState *state, EntryList *list)
         }
 
         char full_path[PATH_MAX];
-        helper_set_full_path(full_path, sizeof(full_path), dir_entry->d_name, state);
+        helper_set_full_path(full_path, sizeof(full_path), state->dir_path, dir_entry->d_name);
 
         struct stat entry_stat;
         struct stat target_stat;
@@ -186,7 +184,7 @@ void restore_cursor(AppState *state, EntryList *list)
 void navigate_subdir(AppState *state, EntryList *list)
 {
     char new_path[PATH_MAX];
-    helper_set_full_path(new_path, sizeof(new_path), list->cursor->name, state);
+    helper_set_full_path(new_path, sizeof(new_path), state->dir_path, list->cursor->name);
 
     free(state->dir_path);
     state->dir_path = strdup(new_path);
@@ -219,7 +217,7 @@ void delete_entry(AppState *state, EntryList *list)
     }
 
     char full_path[PATH_MAX];
-    helper_set_full_path(full_path, sizeof(full_path), list->cursor->name, state);
+    helper_set_full_path(full_path, sizeof(full_path), state->dir_path, list->cursor->name);
 
     if (remove(full_path) == 0)
     {
@@ -259,7 +257,7 @@ void open_entry(AppState *state, EntryList *list)
     }
 
     char full_path[PATH_MAX];
-    helper_set_full_path(full_path, sizeof(full_path), list->cursor->name, state);
+    helper_set_full_path(full_path, sizeof(full_path), state->dir_path, list->cursor->name);
 
     def_prog_mode();
     endwin();
@@ -282,7 +280,7 @@ void create_entry(char *name, AppState *state)
     }
 
     char full_path[PATH_MAX];
-    helper_set_full_path(full_path, sizeof(full_path), name, state);
+    helper_set_full_path(full_path, sizeof(full_path), state->dir_path, name);
 
     bool is_directory = false;
     if (name_len > 0 && name[name_len - 1] == '/')
@@ -393,17 +391,4 @@ static int remove_callback(const char *path, const struct stat *sb, int typeflag
     }
 
     return result;
-}
-
-char *helper_set_full_path(char *buffer, size_t buffer_size, char *name, AppState *state)
-{
-    if (strcmp(state->dir_path, "/") == 0)
-    {
-        snprintf(buffer, buffer_size, "/%s", name);
-    }
-    else
-    {
-        snprintf(buffer, buffer_size, "%s/%s", state->dir_path, name);
-    }
-    return buffer;
 }
