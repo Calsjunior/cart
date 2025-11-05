@@ -206,20 +206,23 @@ static void draw_status_line(AppState *state, EntryList *list)
     unapply_color(THEME_STATUS_SEPARATOR);
 
     // Filename
-    if (list->cursor == NULL)
+    if (list->cursor != NULL)
     {
-        return;
+        int str_width = 30;
+        char filename[str_width];
+        truncate_middle(filename, sizeof(filename), list->cursor->name, str_width);
+        apply_color(THEME_STATUS_INFO);
+        mvprintw(status_row, current_x + 3, " %s", filename);
+        unapply_color(THEME_STATUS_INFO);
     }
-    int str_width = 30;
-    char filename[str_width];
-    truncate_middle(filename, sizeof(filename), list->cursor->name, str_width);
-    apply_color(THEME_STATUS_INFO);
-    mvprintw(status_row, current_x + 3, " %s", filename);
-    unapply_color(THEME_STATUS_INFO);
 
     /* Right section */
     char right_buffer[128];
-    int cursor_position = get_cursor_position(list) + 1;
+    int cursor_position = get_cursor_position(list);
+    if (list->cursor != NULL)
+    {
+        cursor_position++;
+    }
     snprintf(right_buffer, sizeof(right_buffer), "%4d/%-4d", cursor_position, list->count_entries);
     int right_x = max_cols - strlen(right_buffer);
 
