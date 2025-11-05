@@ -9,6 +9,9 @@ void draw_delete_entry_prompt(AppState *state, EntryList *list)
         .height_ratio = 0.2,
         .width_ratio = 0.3,
         .alignment = MODAL_TOPHALF_CENTER,
+        .bg_color = THEME_MODAL_BG,
+        .border_color = THEME_MODAL_BORDER,
+        .title_color = THEME_DELETE_TITLE,
     };
 
     int height, width;
@@ -17,9 +20,10 @@ void draw_delete_entry_prompt(AppState *state, EntryList *list)
     char full_path[PATH_MAX];
     helper_set_full_path(full_path, sizeof(full_path), state->dir_path, list->cursor->name);
 
+    // Truncate the beginning of the path, width - 6 seems to works well
     char display_path[512];
     int max_path_width = width - 6;
-    truncate_path(display_path, sizeof(display_path), full_path, max_path_width);
+    truncate_start(display_path, sizeof(display_path), full_path, max_path_width);
 
     // Prints the path name
     int path_y = 3;
@@ -35,8 +39,10 @@ void draw_delete_entry_prompt(AppState *state, EntryList *list)
     int option_y = 6;
     int option_x = (width - total_width) / 2;
 
+    WCOLOR_ON(delete_win, THEME_DELETE_OPTION);
     mvwprintw(delete_win, option_y, option_x, " %s ", yes_option);
     mvwprintw(delete_win, option_y, option_x + strlen(yes_option) + spacing, " %s ", no_option);
+    WCOLOR_OFF(delete_win, THEME_DELETE_OPTION);
 
     wrefresh(delete_win);
     destroy_modal(delete_win);

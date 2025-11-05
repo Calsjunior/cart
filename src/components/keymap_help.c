@@ -42,6 +42,9 @@ void draw_keymap_help(void)
         .height_ratio = 0.5,
         .width_ratio = 0.1,
         .alignment = MODAL_BOTTOM_RIGHT,
+        .bg_color = THEME_MODAL_BG,
+        .border_color = THEME_MODAL_BORDER,
+        .title_color = THEME_MODAL_TITLE,
     };
 
     int height, width;
@@ -59,7 +62,9 @@ void draw_keymap_help(void)
         }
 
         KeySection *section = &sections[i];
+        WCOLOR_ON(help_win, THEME_KEYHELP_SECTION);
         mvwprintw(help_win, current_row, key_col, "%s", section->name);
+        WCOLOR_OFF(help_win, THEME_KEYHELP_SECTION);
         current_row++;
 
         for (int i = 0; i < section->num_mappings; i++)
@@ -70,8 +75,12 @@ void draw_keymap_help(void)
             }
 
             KeyMapping *mapping = &section->mappings[i];
+            WCOLOR_ON(help_win, THEME_KEYHELP_KEYS);
             mvwprintw(help_win, current_row, key_col + 2, "%-8s", mapping->keys);
+            WCOLOR_OFF(help_win, THEME_KEYHELP_KEYS);
+            WCOLOR_ON(help_win, THEME_KEYHELP_DESC);
             mvwprintw(help_win, current_row, desc_col, "%s", mapping->description);
+            WCOLOR_OFF(help_win, THEME_KEYHELP_DESC);
             current_row++;
         }
     }

@@ -1,6 +1,9 @@
 #ifndef COLORS_H
 #define COLORS_H
 
+#define WCOLOR_ON(win, color) apply_color_win(win, color)
+#define WCOLOR_OFF(win, color) unapply_color_win(win, color)
+
 #include <ncurses.h>
 
 typedef enum
@@ -27,7 +30,8 @@ typedef enum
 
 typedef enum
 {
-    // UI
+    /* UI */
+    // Status and path line
     THEME_PATH_LINE = 1,
     THEME_STATUS_LINE,
     THEME_STATUS_SEPARATOR,
@@ -36,6 +40,20 @@ typedef enum
     THEME_STATUS_POSITION,
     THEME_STATUS_POSITION_SEPARATOR,
     THEME_STATUS_PERCENT,
+
+    // Modal
+    THEME_MODAL_BG,
+    THEME_MODAL_BORDER,
+    THEME_MODAL_TITLE,
+
+    // Deletion prompt
+    THEME_DELETE_TITLE,
+    THEME_DELETE_OPTION,
+
+    // Keymaps help
+    THEME_KEYHELP_SECTION,
+    THEME_KEYHELP_KEYS,
+    THEME_KEYHELP_DESC,
 
     // Browser colors
     THEME_DIR,
@@ -59,5 +77,8 @@ typedef struct
 void init_colors(void);
 void apply_color(ThemeColor theme_color);
 void unapply_color(ThemeColor theme_color);
+
+void apply_color_win(WINDOW *win, ThemeColor theme_color);
+void unapply_color_win(WINDOW *win, ThemeColor theme_color);
 
 #endif

@@ -46,12 +46,32 @@ WINDOW *create_modal(ModalConfig config, int *out_height, int *out_width)
     }
 
     WINDOW *win = newwin(height, width, start_y, start_x);
-    box(win, 0, 0);
+    if (config.bg_color != 0)
+    {
+        wbkgd(win, COLOR_PAIR(config.bg_color) | ' ');
+    }
+
+    if (config.border_color != 0)
+    {
+        WCOLOR_ON(win, config.border_color);
+        box(win, 0, 0);
+        WCOLOR_OFF(win, config.border_color);
+    }
+    else
+    {
+        box(win, 0, 0);
+    }
 
     if (config.title != NULL)
     {
         int title_x = (width - strlen(config.title)) / 2;
+
+        if (config.title_color != 0)
+        {
+            WCOLOR_ON(win, config.title_color);
+        }
         mvwprintw(win, 0, title_x, " %s ", config.title);
+        WCOLOR_OFF(win, config.title_color);
     }
 
     if (out_height != NULL)

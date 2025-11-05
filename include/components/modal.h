@@ -5,6 +5,8 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include "colors.h"
+
 typedef enum
 {
     MODAL_CENTER,
@@ -20,6 +22,9 @@ typedef struct
     float height_ratio;
     float width_ratio;
     ModalAlignment alignment;
+    ThemeColor bg_color;
+    ThemeColor border_color;
+    ThemeColor title_color;
 } ModalConfig;
 
 WINDOW *create_modal(ModalConfig config, int *out_height, int *out_width);
