@@ -34,6 +34,11 @@ WINDOW *create_modal(ModalConfig config, int *out_height, int *out_width)
             start_x = (max_cols - width) / 2;
             break;
 
+        case MODAL_TOPHALF_CENTER:
+            start_y = (max_rows - height) / 4;
+            start_x = (max_cols - width) / 2;
+            break;
+
         case MODAL_BOTTOM_RIGHT:
             start_y = max_rows - height - 1;
             start_x = max_cols - width;

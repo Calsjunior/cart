@@ -8,6 +8,7 @@
 typedef enum
 {
     MODAL_CENTER,
+    MODAL_TOPHALF_CENTER,
     MODAL_BOTTOM_RIGHT,
 } ModalAlignment;
 
