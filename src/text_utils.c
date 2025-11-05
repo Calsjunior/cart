@@ -22,8 +22,8 @@ void truncate_start(char *dest, size_t dest_size, const char *src, int max_width
         return;
     }
 
-    int start_pos = src_len - max_width - 3;
-    snprintf(dest, dest_size, "…%s,", src + start_pos);
+    int start_pos = src_len - max_width;
+    snprintf(dest, dest_size, "…%s", src + start_pos);
 }
 
 void truncate_middle(char *dest, size_t dest_size, const char *src, int max_width)
