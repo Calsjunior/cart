@@ -34,6 +34,7 @@ typedef struct
 
     char input[ENTRY_SIZE];
     int input_pos;
+    int last_keypress;
 } AppState;
 
 #endif
