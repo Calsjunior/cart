@@ -3,6 +3,8 @@
 
 #include <ncurses.h>
 
+#include "state.h"
+
 #define CTRL(x) ((x) & 0x1f)
 
 typedef enum
@@ -20,12 +22,14 @@ typedef enum
     CONFIRM_NO,
     OPEN,
     CREATE,
+    TEXT_INPUT,
     RESIZE,
     TOGGLE_HIDDEN,
     KEYMAP_HELP,
+    ESC,
     QUIT
 } Action;
 
-Action get_action(int ch);
+Action get_action(int ch, AppState *state);
 
 #endif

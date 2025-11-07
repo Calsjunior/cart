@@ -4,6 +4,7 @@
 #include <ncurses.h>
 
 #include "colors.h"
+#include "components/create.h"
 #include "components/delete.h"
 #include "components/file_browser.h"
 #include "components/keymap_help.h"
