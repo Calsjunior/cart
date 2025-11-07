@@ -16,9 +16,9 @@ void init_ui(void)
     initscr();            // Initializes screen
     cbreak();             // Disable line buffering (waiting for enter)
     noecho();             // Don't echo keypresses to screen
-    curs_set(FALSE);      // Display cursor
+    curs_set(0);          // Display cursor
     keypad(stdscr, TRUE); // Enable special keys like arrow keys
-    halfdelay(TRUE);
+    halfdelay(1);
     set_escdelay(1);
     getmaxyx(stdscr, max_rows, max_cols);
     init_colors(); // From "colors.h"
@@ -86,13 +86,11 @@ void handle_input(Action key, AppState *state, Stack *stack, EntryList *list)
 
     if (state->mode == MODE_PROMPT)
     {
+        if (state->prompt_type == PROMPT_CREATE)
+        {
+            handle_text_input(key, state);
+        }
         handle_prompt_mode(key, state, stack, list);
-        return;
-    }
-
-    if (state->mode == MODE_PROMPT && state->prompt_type == PROMPT_CREATE)
-    {
-        handle_text_input(key, state);
         return;
     }
 }
@@ -204,7 +202,7 @@ static void handle_normal_mode(Action key, AppState *state, Stack *stack, EntryL
         case CREATE:
             state->mode = MODE_PROMPT;
             state->prompt_type = PROMPT_CREATE;
-            curs_set(TRUE);
+            curs_set(1);
             break;
 
         case TOGGLE_HIDDEN:
@@ -250,7 +248,7 @@ static void handle_prompt_mode(Action key, AppState *state, Stack *stack, EntryL
             state->refresh = true;
 
         case PROMPT_CREATE:
-            if (key == CONFIRM_YES)
+            if (key == CONFIRM_YES && state->input_pos > 0)
             {
                 create_entry(state->input, state);
                 helper_set_mode_normal(state);
@@ -265,9 +263,28 @@ static void handle_prompt_mode(Action key, AppState *state, Stack *stack, EntryL
 
 static void handle_text_input(Action key, AppState *state)
 {
+    int ch = state->last_keypress;
     switch (key)
     {
-        case DELETE:
+        case TEXT_INPUT:
+            if (state->input_pos < ENTRY_SIZE - 1)
+            {
+                state->input[state->input_pos] = (char) ch;
+                state->input_pos++;
+                state->input[state->input_pos] = '\0';
+            }
+            break;
+
+        case TEXT_BACKSPACE:
+            if (state->input_pos > 0)
+            {
+                state->input_pos--;
+                state->input[state->input_pos] = '\0';
+            }
+            break;
+
+        // TODO: Properly implement delete key to delete backwards
+        case TEXT_DELETE:
             if (state->input_pos > 0)
             {
                 state->input_pos--;
@@ -283,8 +300,7 @@ static void helper_set_mode_normal(AppState *state)
     state->prompt_type = PROMPT_NONE;
     state->input[0] = '\0';
     state->input_pos = 0;
-
-    curs_set(FALSE);
+    curs_set(0);
 }
 
 static void do_resize(void)

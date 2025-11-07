@@ -34,12 +34,10 @@ void draw_create_entry_prompt(AppState *state)
         display_len = max_input_width;
     }
 
-    wmove(create_win, input_y, input_x);
-
     mvwprintw(create_win, input_y, input_x, "%.*s", display_len, state->input + scroll_offset);
 
-    int cursor_x = input_x + (state->input_pos - scroll_offset);
-    wmove(create_win, input_y, cursor_x);
+    int cursor_x = input_x + state->input_pos - scroll_offset;
+    mvwaddch(create_win, input_y, cursor_x, '_');
 
     wrefresh(create_win);
 }

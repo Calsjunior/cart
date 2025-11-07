@@ -9,6 +9,7 @@
 
 typedef enum
 {
+    // NORMAL MODE
     MOVE_UP,
     MOVE_UP_HALF,
     MOVE_UP_ALL,
@@ -18,11 +19,18 @@ typedef enum
     MOVE_LEFT,
     MOVE_RIGHT,
     DELETE,
+
     CONFIRM_YES,
     CONFIRM_NO,
     OPEN,
     CREATE,
+
+    // CREATE MODE
     TEXT_INPUT,
+    TEXT_BACKSPACE,
+    TEXT_DELETE,
+
+    // General
     RESIZE,
     TOGGLE_HIDDEN,
     KEYMAP_HELP,
