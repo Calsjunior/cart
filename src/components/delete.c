@@ -26,7 +26,7 @@ void draw_delete_entry_prompt(AppState *state, EntryList *list)
     truncate_start(display_path, sizeof(display_path), full_path, max_path_width);
 
     // Prints the path name
-    int path_y = 3;
+    int path_y = height / 2;
     int path_x = height / 2;
     mvwprintw(delete_win, path_y, path_x, "%s", display_path);
 

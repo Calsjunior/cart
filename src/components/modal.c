@@ -7,11 +7,11 @@ WINDOW *create_modal(ModalConfig config, int *out_height, int *out_width)
 
     if (height < config.min_height)
     {
-        height = config.min_height;
+        height = config.min_height - 2;
     }
     if (width < config.min_width)
     {
-        width = config.min_width;
+        width = config.min_width - 2;
     }
 
     // Ensure UI fits on the screen
