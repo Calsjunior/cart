@@ -36,7 +36,7 @@ void draw_delete_entry_prompt(AppState *state, EntryList *list)
 
     int spacing = 15;
     int total_width = strlen(yes_option) + strlen(no_option) + spacing;
-    int option_y = 6;
+    int option_y = height - 1;
     int option_x = (width - total_width) / 2;
 
     WCOLOR_ON(delete_win, THEME_DELETE_OPTION);
