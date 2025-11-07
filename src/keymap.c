@@ -1,64 +1,99 @@
 #include "keymap.h"
 
-Action get_action(int ch)
+Action get_action(int ch, AppState *state)
 {
-    switch (ch)
+    // Universal quit and esc
+    if (state->prompt_type != PROMPT_CREATE)
     {
-        case 'q':
-            return QUIT;
-        case '?':
-            return KEYMAP_HELP;
-        case KEY_RESIZE:
-            return RESIZE;
-        case '.':
-            return TOGGLE_HIDDEN;
+        switch (ch)
+        {
+            case 'q':
+                return QUIT;
+            case 27:
+                return ESC;
+        }
+    }
 
-        // Navigation Keys
-        case KEY_UP:
-        case 'k':
-            return MOVE_UP;
-        case KEY_DOWN:
-        case 'j':
-            return MOVE_DOWN;
-        case KEY_LEFT:
-        case 'h':
-            return MOVE_LEFT;
-        case KEY_RIGHT:
-        case 10:  // Enter key
-        case ' ': // Space key
-        case 'l':
-            return MOVE_RIGHT;
-        case KEY_PPAGE:
-        case CTRL('u'):
-            return MOVE_UP_HALF;
-        case KEY_NPAGE:
-        case CTRL('d'):
-            return MOVE_DOWN_HALF;
-        case KEY_HOME:
-        case 'g':
-            return MOVE_UP_ALL;
-        case KEY_END:
-        case 'G':
-            return MOVE_DOWN_ALL;
+    if (state->mode == MODE_NORMAL)
+    {
+        switch (ch)
+        {
+            case '?':
+                return KEYMAP_HELP;
+            case KEY_RESIZE:
+                return RESIZE;
+            case '.':
+                return TOGGLE_HIDDEN;
 
-        // Action
-        case KEY_DC:
-        case 'd':
-            return DELETE;
-        case 'y':
-        case 'Y':
-        case '1':
-            return CONFIRM_YES;
-        case 'n':
-        case 'N':
-        case '2':
-            return CONFIRM_NO;
-        case 'v':
-            return OPEN;
-        case 'a':
-            return CREATE;
-        default:
-            break;
+            // Navigation Keys
+            case KEY_UP:
+            case 'k':
+                return MOVE_UP;
+            case KEY_DOWN:
+            case 'j':
+                return MOVE_DOWN;
+            case KEY_LEFT:
+            case 'h':
+                return MOVE_LEFT;
+            case KEY_RIGHT:
+            case 10:  // Enter key
+            case ' ': // Space key
+            case 'l':
+                return MOVE_RIGHT;
+            case KEY_PPAGE:
+            case CTRL('u'):
+                return MOVE_UP_HALF;
+            case KEY_NPAGE:
+            case CTRL('d'):
+                return MOVE_DOWN_HALF;
+            case KEY_HOME:
+            case 'g':
+                return MOVE_UP_ALL;
+            case KEY_END:
+            case 'G':
+                return MOVE_DOWN_ALL;
+
+            // Action
+            case KEY_DC:
+            case 'd':
+                return DELETE;
+            case 'v':
+                return OPEN;
+            case 'a':
+                return CREATE;
+            default:
+                break;
+        }
+    }
+
+    if (state->mode == MODE_PROMPT && state->prompt_type == PROMPT_DELETE)
+    {
+        switch (ch)
+        {
+            case 'y':
+            case 'Y':
+            case '1':
+                return CONFIRM_YES;
+            case 'n':
+            case 'N':
+            case '2':
+                return CONFIRM_NO;
+        }
+    }
+
+    if (state->mode == MODE_PROMPT && state->prompt_type == PROMPT_CREATE)
+    {
+        switch (ch)
+        {
+            case KEY_BACKSPACE:
+                return DELETE;
+            case '\n':
+            case '\r':
+            case KEY_ENTER:
+                return CONFIRM_YES;
+            default:
+                return TEXT_INPUT;
+        }
     }
     return -1;
 }

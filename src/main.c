@@ -45,7 +45,7 @@ int main(void)
         refresh();
         ch = getch();
 
-        Action key = get_action(ch);
+        Action key = get_action(ch, &state);
         handle_input(key, &state, &stack, &list);
     }
 
