@@ -2,16 +2,19 @@
 
 Action get_action(int ch, AppState *state)
 {
+    state->last_keypress = ch;
+
     // Universal quit and esc
-    if (state->prompt_type != PROMPT_CREATE)
+    switch (ch)
     {
-        switch (ch)
-        {
-            case 'q':
+        case 'q':
+            if (state->prompt_type != PROMPT_CREATE)
+            {
                 return QUIT;
-            case 27:
-                return ESC;
-        }
+            }
+            break;
+        case 27:
+            return ESC;
     }
 
     if (state->mode == MODE_NORMAL)
@@ -66,7 +69,7 @@ Action get_action(int ch, AppState *state)
         }
     }
 
-    if (state->mode == MODE_PROMPT && state->prompt_type == PROMPT_DELETE)
+    else if (state->mode == MODE_PROMPT && state->prompt_type == PROMPT_DELETE)
     {
         switch (ch)
         {
@@ -81,18 +84,25 @@ Action get_action(int ch, AppState *state)
         }
     }
 
-    if (state->mode == MODE_PROMPT && state->prompt_type == PROMPT_CREATE)
+    else if (state->mode == MODE_PROMPT && state->prompt_type == PROMPT_CREATE)
     {
         switch (ch)
         {
-            case KEY_BACKSPACE:
-                return DELETE;
             case '\n':
             case '\r':
             case KEY_ENTER:
                 return CONFIRM_YES;
+            case KEY_BACKSPACE:
+            case 128:
+                return TEXT_BACKSPACE;
+            case KEY_DC:
+                return TEXT_DELETE;
             default:
-                return TEXT_INPUT;
+                if (ch >= 32 && ch < 127)
+                {
+                    return TEXT_INPUT;
+                }
+                break;
         }
     }
     return -1;
