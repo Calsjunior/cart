@@ -1,9 +1,8 @@
 #include "ui.h"
 
-static void draw_create_entry_prompt(AppState *state);
-
 static void handle_normal_mode(Action key, AppState *state, Stack *stack, EntryList *list);
 static void handle_prompt_mode(Action key, AppState *state, Stack *stack, EntryList *list);
+static void handle_text_input(Action key, AppState *state);
 
 static void helper_set_mode_normal(AppState *state);
 
@@ -20,6 +19,7 @@ void init_ui(void)
     curs_set(FALSE);      // Display cursor
     keypad(stdscr, TRUE); // Enable special keys like arrow keys
     halfdelay(TRUE);
+    set_escdelay(1);
     getmaxyx(stdscr, max_rows, max_cols);
     init_colors(); // From "colors.h"
 }
@@ -69,6 +69,15 @@ void handle_input(Action key, AppState *state, Stack *stack, EntryList *list)
         return;
     }
 
+    if (key == ESC)
+    {
+        if (state->mode == MODE_PROMPT)
+        {
+            helper_set_mode_normal(state);
+            return;
+        }
+    }
+
     if (state->mode == MODE_NORMAL)
     {
         handle_normal_mode(key, state, stack, list);
@@ -80,39 +89,17 @@ void handle_input(Action key, AppState *state, Stack *stack, EntryList *list)
         handle_prompt_mode(key, state, stack, list);
         return;
     }
+
+    if (state->mode == MODE_PROMPT && state->prompt_type == PROMPT_CREATE)
+    {
+        handle_text_input(key, state);
+        return;
+    }
 }
 
 void clean_ui()
 {
     endwin();
-}
-
-// TODO: fix these disguisting UI madness
-static void draw_create_entry_prompt(AppState *state)
-{
-    int height, width, start_rows, start_cols;
-    height = max_rows / 5;
-    width = max_cols / 2;
-    start_rows = (max_rows - height) / 4;
-    start_cols = (max_cols - width) / 2;
-    WINDOW *creationwin = newwin(height, width, start_rows, start_cols);
-    refresh();
-
-    const char *create_entry = "Add new file to the current working directory (directory ends with '/')";
-    int create_entry_cols = width - strlen(create_entry) / 2;
-    mvwprintw(creationwin, 1, create_entry_cols, "%s", create_entry);
-
-    box(creationwin, 0, 0);
-
-    echo();
-    curs_set(TRUE);
-
-    mvwgetnstr(creationwin, 3, 5, state->input, sizeof(state->input) - 1);
-
-    noecho();
-    curs_set(FALSE);
-
-    wrefresh(creationwin);
 }
 
 static void handle_normal_mode(Action key, AppState *state, Stack *stack, EntryList *list)
@@ -217,6 +204,7 @@ static void handle_normal_mode(Action key, AppState *state, Stack *stack, EntryL
         case CREATE:
             state->mode = MODE_PROMPT;
             state->prompt_type = PROMPT_CREATE;
+            curs_set(TRUE);
             break;
 
         case TOGGLE_HIDDEN:
@@ -262,12 +250,29 @@ static void handle_prompt_mode(Action key, AppState *state, Stack *stack, EntryL
             state->refresh = true;
 
         case PROMPT_CREATE:
-            create_entry(state->input, state);
-            helper_set_mode_normal(state);
-            state->restore_cursor = true;
-            state->refresh = true;
+            if (key == CONFIRM_YES)
+            {
+                create_entry(state->input, state);
+                helper_set_mode_normal(state);
+                state->restore_cursor = true;
+                state->refresh = true;
+            }
             break;
         default:
+            break;
+    }
+}
+
+static void handle_text_input(Action key, AppState *state)
+{
+    switch (key)
+    {
+        case DELETE:
+            if (state->input_pos > 0)
+            {
+                state->input_pos--;
+                state->input[state->input_pos] = '\0';
+            }
             break;
     }
 }
@@ -276,6 +281,10 @@ static void helper_set_mode_normal(AppState *state)
 {
     state->mode = MODE_NORMAL;
     state->prompt_type = PROMPT_NONE;
+    state->input[0] = '\0';
+    state->input_pos = 0;
+
+    curs_set(FALSE);
 }
 
 static void do_resize(void)
