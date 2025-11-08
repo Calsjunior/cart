@@ -2,7 +2,7 @@
 
 Action get_action(int ch, AppState *state)
 {
-    state->last_keypress = ch;
+    state->input_state.last_keypress = ch;
 
     // Universal quit and esc
     switch (ch)
@@ -50,8 +50,9 @@ Action get_action(int ch, AppState *state)
             case CTRL('d'):
                 return MOVE_DOWN_HALF;
             case KEY_HOME:
-            case 'g':
                 return MOVE_UP_ALL;
+            case 'g':
+                return GOTO;
             case KEY_END:
             case 'G':
                 return MOVE_DOWN_ALL;

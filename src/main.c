@@ -22,7 +22,8 @@ int main(void)
                       .running = true,
                       .restore_cursor = false,
                       .mode = MODE_NORMAL,
-                      .prompt_type = PROMPT_NONE};
+                      .prompt_type = PROMPT_NONE,
+                      .goto_state = GOTO_NONE};
     Stack stack = {.top = NULL};
 
     int ch;

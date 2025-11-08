@@ -1,7 +1,10 @@
 #ifndef UI_H
 #define UI_H
 
+#define _XOPEN_SOURCE 700
+
 #include <ncurses.h>
+#include <strings.h>
 
 #include "colors.h"
 #include "components/create.h"

@@ -311,6 +311,18 @@ void create_entry(char *name, AppState *state)
     state->scroll_offset = 0;
 }
 
+void go_to_entry(char ch, EntryList *list)
+{
+    for (EntryNode *current = list->head; current != NULL; current = current->next)
+    {
+        if (current->name[0] == ch)
+        {
+            list->cursor = current;
+            break;
+        }
+    }
+}
+
 static void add_entry_node(char *name, EntryType type, EntryList *list)
 {
     EntryNode *node = malloc(sizeof(EntryNode));

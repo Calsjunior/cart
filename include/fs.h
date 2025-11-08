@@ -74,5 +74,6 @@ void navigate_root(AppState *state);
 void delete_entry(AppState *state, EntryList *list);
 void open_entry(AppState *state, EntryList *list);
 void create_entry(char *name, AppState *state);
+void go_to_entry(char ch, EntryList *list);
 
 #endif

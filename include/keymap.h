@@ -19,6 +19,7 @@ typedef enum
     MOVE_LEFT,
     MOVE_RIGHT,
     DELETE,
+    GOTO,
 
     CONFIRM_YES,
     CONFIRM_NO,
@@ -29,6 +30,9 @@ typedef enum
     TEXT_INPUT,
     TEXT_BACKSPACE,
     TEXT_DELETE,
+
+    // GOTO MODE
+    GOTO_CHAR,
 
     // General
     RESIZE,

@@ -3,6 +3,7 @@
 static void handle_normal_mode(Action key, AppState *state, Stack *stack, EntryList *list);
 static void handle_prompt_mode(Action key, AppState *state, Stack *stack, EntryList *list);
 static void handle_text_input(Action key, AppState *state);
+static void handle_go_to_input(AppState *state, EntryList *list);
 
 static void helper_set_mode_normal(AppState *state);
 
@@ -18,7 +19,7 @@ void init_ui(void)
     noecho();             // Don't echo keypresses to screen
     curs_set(0);          // Display cursor
     keypad(stdscr, TRUE); // Enable special keys like arrow keys
-    halfdelay(1);
+    // halfdelay(1);
     set_escdelay(1);
     getmaxyx(stdscr, max_rows, max_cols);
     init_colors(); // From "colors.h"
@@ -43,6 +44,7 @@ void draw_ui(AppState *state, EntryList *list)
             case PROMPT_CREATE:
                 draw_create_entry_prompt(state);
                 break;
+
             default:
                 break;
         }
@@ -202,7 +204,11 @@ static void handle_normal_mode(Action key, AppState *state, Stack *stack, EntryL
         case CREATE:
             state->mode = MODE_PROMPT;
             state->prompt_type = PROMPT_CREATE;
-            curs_set(1);
+            break;
+
+        case GOTO:
+            state->mode = MODE_PROMPT;
+            state->prompt_type = PROMPT_GOTO;
             break;
 
         case TOGGLE_HIDDEN:
@@ -214,6 +220,13 @@ static void handle_normal_mode(Action key, AppState *state, Stack *stack, EntryL
             {
                 state->show_hidden = true;
             }
+
+            if (state->cursor_name != NULL)
+            {
+                free(state->cursor_name);
+            }
+            state->cursor_name = strdup(list->cursor->name);
+            state->restore_cursor = true;
             state->refresh = true;
     }
 }
@@ -248,14 +261,19 @@ static void handle_prompt_mode(Action key, AppState *state, Stack *stack, EntryL
             state->refresh = true;
 
         case PROMPT_CREATE:
-            if (key == CONFIRM_YES && state->input_pos > 0)
+            if (key == CONFIRM_YES && state->input_state.input_pos > 0)
             {
-                create_entry(state->input, state);
+                create_entry(state->input_state.input, state);
                 helper_set_mode_normal(state);
                 state->restore_cursor = true;
                 state->refresh = true;
             }
             break;
+
+        case PROMPT_GOTO:
+            handle_go_to_input(state, list);
+            break;
+
         default:
             break;
     }
@@ -263,32 +281,66 @@ static void handle_prompt_mode(Action key, AppState *state, Stack *stack, EntryL
 
 static void handle_text_input(Action key, AppState *state)
 {
-    int ch = state->last_keypress;
+    int ch = state->input_state.last_keypress;
     switch (key)
     {
         case TEXT_INPUT:
-            if (state->input_pos < ENTRY_SIZE - 1)
+            if (state->input_state.input_pos < ENTRY_SIZE - 1)
             {
-                state->input[state->input_pos] = (char) ch;
-                state->input_pos++;
-                state->input[state->input_pos] = '\0';
+                state->input_state.input[state->input_state.input_pos] = (char) ch;
+                state->input_state.input_pos++;
+                state->input_state.input[state->input_state.input_pos] = '\0';
             }
             break;
 
         case TEXT_BACKSPACE:
-            if (state->input_pos > 0)
+            if (state->input_state.input_pos > 0)
             {
-                state->input_pos--;
-                state->input[state->input_pos] = '\0';
+                state->input_state.input_pos--;
+                state->input_state.input[state->input_state.input_pos] = '\0';
             }
             break;
 
         // TODO: Properly implement delete key to delete backwards
         case TEXT_DELETE:
-            if (state->input_pos > 0)
+            if (state->input_state.input_pos > 0)
             {
-                state->input_pos--;
-                state->input[state->input_pos] = '\0';
+                state->input_state.input_pos--;
+                state->input_state.input[state->input_state.input_pos] = '\0';
+            }
+            break;
+    }
+}
+
+static void handle_go_to_input(AppState *state, EntryList *list)
+{
+    int ch = state->input_state.last_keypress;
+
+    switch (state->goto_state)
+    {
+        case GOTO_NONE:
+            if (ch == 'g')
+            {
+                list->cursor = list->head;
+                helper_set_mode_normal(state);
+            }
+            else if (ch == 'f')
+            {
+                state->goto_state = GOTO_PENDING;
+            }
+            else
+            {
+                helper_set_mode_normal(state);
+            }
+            break;
+
+        case GOTO_PENDING:
+            // If the keypressed is printable
+            if (ch >= 32 && ch < 127)
+            {
+                go_to_entry(ch, list);
+                state->goto_state = GOTO_NONE;
+                helper_set_mode_normal(state);
             }
             break;
     }
@@ -298,9 +350,8 @@ static void helper_set_mode_normal(AppState *state)
 {
     state->mode = MODE_NORMAL;
     state->prompt_type = PROMPT_NONE;
-    state->input[0] = '\0';
-    state->input_pos = 0;
-    curs_set(0);
+    state->input_state.input[0] = '\0';
+    state->input_state.input_pos = 0;
 }
 
 static void do_resize(void)

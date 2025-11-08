@@ -4,7 +4,7 @@ static KeyMapping nav_mappings[] = {
     {" / , k/j", "Move cursor up/down"},
     {" / , h/l", "Enter/Exit directory"},
     {"PgUp/PgDn, ^U/^D", "Move half page"},
-    {"g", "Jump to top"},
+    {"gg", "Jump to top"},
     {"G", "Jump to bottom"},
 };
 
