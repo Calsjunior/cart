@@ -18,7 +18,21 @@ typedef enum
     PROMPT_DELETE,
     PROMPT_OPEN,
     PROMPT_CREATE,
+    PROMPT_GOTO,
 } PromptType;
+
+typedef enum
+{
+    GOTO_NONE,
+    GOTO_PENDING,
+} GoToState;
+
+typedef struct
+{
+    char input[ENTRY_SIZE];
+    int input_pos;
+    int last_keypress;
+} InputState;
 
 typedef struct
 {
@@ -31,10 +45,8 @@ typedef struct
     bool show_hidden;
     AppMode mode;
     PromptType prompt_type;
-
-    char input[ENTRY_SIZE];
-    int input_pos;
-    int last_keypress;
+    InputState input_state;
+    GoToState goto_state;
 } AppState;
 
 #endif

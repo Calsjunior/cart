@@ -23,20 +23,20 @@ void draw_create_entry_prompt(AppState *state)
     int max_input_width = width - 6;
 
     int scroll_offset = 0;
-    if (state->input_pos > max_input_width)
+    if (state->input_state.input_pos > max_input_width)
     {
-        scroll_offset = state->input_pos - max_input_width;
+        scroll_offset = state->input_state.input_pos - max_input_width;
     }
 
-    int display_len = state->input_pos - scroll_offset;
+    int display_len = state->input_state.input_pos - scroll_offset;
     if (display_len > max_input_width)
     {
         display_len = max_input_width;
     }
 
-    mvwprintw(create_win, input_y, input_x, "%.*s", display_len, state->input + scroll_offset);
+    mvwprintw(create_win, input_y, input_x, "%.*s", display_len, state->input_state.input + scroll_offset);
 
-    int cursor_x = input_x + state->input_pos - scroll_offset;
+    int cursor_x = input_x + state->input_state.input_pos - scroll_offset;
     mvwaddch(create_win, input_y, cursor_x, '_');
 
     wrefresh(create_win);
