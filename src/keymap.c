@@ -8,7 +8,7 @@ Action get_action(int ch, AppState *state)
     switch (ch)
     {
         case 'q':
-            if (state->prompt_type != PROMPT_CREATE)
+            if (state->prompt_type != PROMPT_CREATE && state->prompt_type != PROMPT_GOTO)
             {
                 return QUIT;
             }
@@ -102,6 +102,23 @@ Action get_action(int ch, AppState *state)
                 if (ch >= 32 && ch < 127)
                 {
                     return TEXT_INPUT;
+                }
+                break;
+        }
+    }
+
+    else if (state->mode == MODE_PROMPT && state->prompt_type == PROMPT_GOTO)
+    {
+        switch (ch)
+        {
+            case 'g':
+                return GOTO_TOP;
+            case 'f':
+                return GOTO_FIND;
+            default:
+                if (ch >= 32 && ch < 127)
+                {
+                    return GOTO_CHAR;
                 }
                 break;
         }

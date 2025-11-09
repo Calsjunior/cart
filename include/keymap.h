@@ -32,6 +32,8 @@ typedef enum
     TEXT_DELETE,
 
     // GOTO MODE
+    GOTO_TOP,
+    GOTO_FIND,
     GOTO_CHAR,
 
     // General

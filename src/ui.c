@@ -3,7 +3,7 @@
 static void handle_normal_mode(Action key, AppState *state, Stack *stack, EntryList *list);
 static void handle_prompt_mode(Action key, AppState *state, Stack *stack, EntryList *list);
 static void handle_text_input(Action key, AppState *state);
-static void handle_go_to_input(AppState *state, EntryList *list);
+static void handle_go_to_input(Action key, AppState *state, EntryList *list);
 
 static void helper_set_mode_normal(AppState *state);
 
@@ -271,7 +271,7 @@ static void handle_prompt_mode(Action key, AppState *state, Stack *stack, EntryL
             break;
 
         case PROMPT_GOTO:
-            handle_go_to_input(state, list);
+            handle_go_to_input(key, state, list);
             break;
 
         default:
@@ -312,31 +312,30 @@ static void handle_text_input(Action key, AppState *state)
     }
 }
 
-static void handle_go_to_input(AppState *state, EntryList *list)
+static void handle_go_to_input(Action key, AppState *state, EntryList *list)
 {
     int ch = state->input_state.last_keypress;
 
     switch (state->goto_state)
     {
         case GOTO_NONE:
-            if (ch == 'g')
+            if (key == GOTO_TOP)
             {
                 list->cursor = list->head;
                 helper_set_mode_normal(state);
+                return;
             }
-            else if (ch == 'f')
+
+            if (key == GOTO_FIND)
             {
                 state->goto_state = GOTO_PENDING;
+                return;
             }
-            else
-            {
-                helper_set_mode_normal(state);
-            }
+            helper_set_mode_normal(state);
             break;
 
         case GOTO_PENDING:
-            // If the keypressed is printable
-            if (ch >= 32 && ch < 127)
+            if (key == GOTO_CHAR)
             {
                 go_to_entry(ch, list);
                 state->goto_state = GOTO_NONE;
