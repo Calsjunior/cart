@@ -315,7 +315,6 @@ static void handle_text_input(Action key, AppState *state)
 static void handle_go_to_input(Action key, AppState *state, EntryList *list)
 {
     int ch = state->input_state.last_keypress;
-
     switch (state->goto_state)
     {
         case GOTO_NONE:

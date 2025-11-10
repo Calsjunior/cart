@@ -14,6 +14,7 @@ typedef struct
 } EntryTypeExt;
 
 const char *get_entry_icon(const char *entryname, EntryType type);
+ThemeColor get_entry_icon_color(const char *entryname, EntryType type);
 ThemeColor get_entry_color(const char *entryname, EntryType type);
 
 #endif

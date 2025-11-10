@@ -55,12 +55,16 @@ typedef enum
     THEME_KEYHELP_KEYS,
     THEME_KEYHELP_DESC,
 
-    // Browser colors
+    /* Browserd */
+    // Entry name
     THEME_DIR,
     THEME_FILE,
 
-    // File extension colors
-    THEME_CODE_C,
+    // Entry icon
+    THEME_DIR_ICON,
+    THEME_FILE_ICON,
+    THEME_C_ICON,
+    THEME_PYTHON_ICON,
 
     // Selection
     THEME_SELECTED,

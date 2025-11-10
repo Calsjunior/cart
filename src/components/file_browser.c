@@ -28,15 +28,24 @@ void draw_file_browser(AppState *state, EntryList *list)
             break;
         }
 
+        const char *icon = get_entry_icon(current->name, current->type);
+        ThemeColor icon_color = get_entry_icon_color(current->name, current->type);
+        ThemeColor entry_color = get_entry_color(current->name, current->type);
+
+        // Apply icon colors except the cursor, so the selection can match the entry's color
         if (current == list->cursor)
         {
             WCOLOR_ON(stdscr, THEME_SELECTED);
+            WCOLOR_ON(stdscr, entry_color);
+            mvprintw(row, 1, " %s", icon);
+            WCOLOR_OFF(stdscr, entry_color);
         }
-
-        const char *icon = get_entry_icon(current->name, current->type);
-        ThemeColor color = get_entry_color(current->name, current->type);
-
-        mvprintw(row, 1, " %s", icon);
+        else
+        {
+            WCOLOR_ON(stdscr, icon_color);
+            mvprintw(row, 1, " %s", icon);
+            WCOLOR_OFF(stdscr, icon_color);
+        }
 
         if (current->type == ENTRY_SYMLINK_DIR || current->type == ENTRY_SYMLINK_FILE)
         {
@@ -54,7 +63,9 @@ void draw_file_browser(AppState *state, EntryList *list)
         }
         else
         {
+            WCOLOR_ON(stdscr, entry_color);
             mvprintw(row, 3, " %s", current->name);
+            WCOLOR_OFF(stdscr, entry_color);
         }
 
         WCOLOR_OFF(stdscr, THEME_SELECTED);

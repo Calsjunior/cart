@@ -19,9 +19,9 @@ static EntryTypeExt ext_list[] = {
     {".mov", " "},
 
     // Languages
-    {".c", "󰙱 ", THEME_CODE_C},
-    {".cpp", "󰙲 "},
-    {".py", " "},
+    {".c", "󰙱 ", THEME_C_ICON},
+    {".cpp", "󰙲 ", THEME_C_ICON},
+    {".py", " ", THEME_PYTHON_ICON},
     {".sh", " "},
     {".json", " "},
     {".lua", "󰢱 "},
@@ -74,7 +74,7 @@ const char *get_entry_icon(const char *entryname, EntryType type)
     return " ";
 }
 
-ThemeColor get_entry_color(const char *entryname, EntryType type)
+ThemeColor get_entry_icon_color(const char *entryname, EntryType type)
 {
     if (type == ENTRY_DIR)
     {
@@ -95,4 +95,15 @@ ThemeColor get_entry_color(const char *entryname, EntryType type)
         }
     }
     return THEME_FILE;
+}
+
+ThemeColor get_entry_color(const char *entryname, EntryType type)
+{
+    switch (type)
+    {
+        case ENTRY_DIR:
+            return THEME_DIR;
+        default:
+            return THEME_FILE;
+    }
 }
