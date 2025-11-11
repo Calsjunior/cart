@@ -143,6 +143,7 @@ void subdir_stack_pop(AppState *state, Stack *stack, EntryList *list)
     state->scroll_offset = stack_node->scroll_offset;
 
     free(stack_node->path);
+    free(stack_node->cursor_name);
     free(stack_node);
 }
 
@@ -153,6 +154,7 @@ void free_stack(Stack *stack)
     {
         StackNode *next = current_stack_node->next;
         free(current_stack_node->path);
+        free(current_stack_node->cursor_name);
         free(current_stack_node);
         current_stack_node = next;
     }

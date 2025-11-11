@@ -51,6 +51,7 @@ int main(void)
     }
 
     free(state.dir_path);
+    free(state.cursor_name);
     free_list(&list);
     free_stack(&stack);
     clean_ui();
