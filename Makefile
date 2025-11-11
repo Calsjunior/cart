@@ -3,7 +3,7 @@ ifeq ($(shell which $(CC)),)
     CC := clang
 endif
 CFLAGS = -g -O0 -std=c99 -Iinclude
-LDFLAGS = -lncurses
+LDFLAGS = -lncurses -lm
 
 SRC_DIR = src
 OBJ_DIR = obj
