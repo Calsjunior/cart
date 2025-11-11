@@ -45,6 +45,9 @@ void draw_ui(AppState *state, EntryList *list)
                 draw_create_entry_prompt(state);
                 break;
 
+            case PROMPT_GOTO:
+                draw_goto_help();
+
             default:
                 break;
         }
@@ -323,6 +326,15 @@ static void handle_go_to_input(Action key, AppState *state, EntryList *list)
                 list->cursor = list->head;
                 helper_set_mode_normal(state);
                 return;
+            }
+
+            if (key == GOTO_HOME)
+            {
+                const char *home = getenv("HOME");
+                free(state->dir_path);
+                state->dir_path = strdup(home);
+                state->refresh = true;
+                helper_set_mode_normal(state);
             }
 
             if (key == GOTO_FIND)

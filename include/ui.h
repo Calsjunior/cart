@@ -10,6 +10,7 @@
 #include "components/create.h"
 #include "components/delete.h"
 #include "components/file_browser.h"
+#include "components/goto.h"
 #include "components/keymap_help.h"
 #include "fs.h"
 #include "icon.h"

@@ -113,6 +113,8 @@ Action get_action(int ch, AppState *state)
         {
             case 'g':
                 return GOTO_TOP;
+            case 'h':
+                return GOTO_HOME;
             case 'f':
                 return GOTO_FIND;
             default:

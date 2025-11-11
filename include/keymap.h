@@ -33,6 +33,7 @@ typedef enum
 
     // GOTO MODE
     GOTO_TOP,
+    GOTO_HOME,
     GOTO_FIND,
     GOTO_CHAR,
 

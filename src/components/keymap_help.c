@@ -4,7 +4,7 @@ static KeyMapping nav_mappings[] = {
     {" / , k/j", "Move cursor up/down"},
     {" / , h/l", "Enter/Exit directory"},
     {"PgUp/PgDn, ^U/^D", "Move half page"},
-    {"gg", "Jump to top"},
+    {"g", "Go to"},
     {"G", "Jump to bottom"},
 };
 
@@ -37,7 +37,7 @@ void draw_keymap_help(void)
 {
     ModalConfig config = {
         .title = "Keymaps",
-        .min_height = 20,
+        .min_height = 21,
         .min_width = 50,
         .height_ratio = 0.5,
         .width_ratio = 0.1,
@@ -69,7 +69,7 @@ void draw_keymap_help(void)
 
         for (int i = 0; i < section->num_mappings; i++)
         {
-            if (current_row >= height - 3)
+            if (current_row >= height - 2)
             {
                 break;
             }

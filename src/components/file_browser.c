@@ -4,7 +4,7 @@ void draw_file_browser(AppState *state, EntryList *list)
 {
     clear();
     draw_path_line(state);
-    int width = draw_split_line();
+    int half_width = draw_split_line();
 
     // Calculate visible space (between top path and bottom status)
     int visible_lines = max_rows - PATH_LINE - STATUS_LINE;
@@ -13,12 +13,12 @@ void draw_file_browser(AppState *state, EntryList *list)
 
     int current_y = SCROLL_PADDING;
     int current_x = 1;
-    int selection = width - 4;
+    int selection = half_width - 4;
     int entry_index = 0;
 
     if (list->cursor == NULL)
     {
-        mvprintw(current_y, current_x + 1, "No item");
+        mvprintw(current_y, half_width / 2, "No item");
     }
 
     for (EntryNode *current = list->head; current != NULL; current = current->next)
@@ -187,14 +187,14 @@ static void draw_status_line(AppState *state, EntryList *list)
 static int draw_split_line(void)
 {
     int start_y = PATH_LINE;
-    int width = max_cols / 2;
+    int half_width = max_cols / 2;
     int height = max_rows - STATUS_LINE - 2;
 
     WCOLOR_ON(stdscr, THEME_PATH_LINE);
     mvvline(PATH_LINE, max_cols / 2, ACS_VLINE, max_rows - STATUS_LINE - 2);
     WCOLOR_OFF(stdscr, THEME_PATH_LINE);
 
-    return width;
+    return half_width;
 }
 
 static void adjust_scroll(int visible_lines, EntryList *list)
