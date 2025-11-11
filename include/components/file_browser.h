@@ -3,6 +3,7 @@
 
 #define _XOPEN_SOURCE 700
 
+#include <math.h>
 #include <unistd.h>
 
 #include "colors.h"
@@ -16,6 +17,7 @@
 void draw_file_browser(AppState *state, EntryList *list);
 static void draw_path_line(AppState *state);
 static void draw_status_line(AppState *state, EntryList *list);
+static int draw_split_line(void);
 
 static void adjust_scroll(int visible_lines, EntryList *list);
 static int get_cursor_position(EntryList *list);

@@ -4,14 +4,22 @@ void draw_file_browser(AppState *state, EntryList *list)
 {
     clear();
     draw_path_line(state);
+    int width = draw_split_line();
 
     // Calculate visible space (between top path and bottom status)
     int visible_lines = max_rows - PATH_LINE - STATUS_LINE;
 
     adjust_scroll(visible_lines, list);
 
-    int row = SCROLL_PADDING;
+    int current_y = SCROLL_PADDING;
+    int current_x = 1;
+    int selection = width - 4;
     int entry_index = 0;
+
+    if (list->cursor == NULL)
+    {
+        mvprintw(current_y, current_x + 1, "No item");
+    }
 
     for (EntryNode *current = list->head; current != NULL; current = current->next)
     {
@@ -23,7 +31,7 @@ void draw_file_browser(AppState *state, EntryList *list)
         }
 
         // Stop drawing if filled the visible area
-        if (row >= max_rows)
+        if (current_y >= max_rows)
         {
             break;
         }
@@ -37,13 +45,13 @@ void draw_file_browser(AppState *state, EntryList *list)
         {
             WCOLOR_ON(stdscr, THEME_SELECTED);
             WCOLOR_ON(stdscr, entry_color);
-            mvprintw(row, 1, " %s", icon);
+            mvprintw(current_y, current_x, " %s", icon);
             WCOLOR_OFF(stdscr, entry_color);
         }
         else
         {
             WCOLOR_ON(stdscr, icon_color);
-            mvprintw(row, 1, " %s", icon);
+            mvprintw(current_y, current_x, " %s", icon);
             WCOLOR_OFF(stdscr, icon_color);
         }
 
@@ -59,17 +67,17 @@ void draw_file_browser(AppState *state, EntryList *list)
                 return;
             }
             target[len] = '\0';
-            mvprintw(row, 3, " %s -> %s", current->name, target);
+            mvprintw(current_y, current_x + 2, " %s -> %s", current->name, target);
         }
         else
         {
             WCOLOR_ON(stdscr, entry_color);
-            mvprintw(row, 3, " %s", current->name);
+            mvprintw(current_y, current_x + 2, " %-*s", selection, current->name);
             WCOLOR_OFF(stdscr, entry_color);
         }
 
         WCOLOR_OFF(stdscr, THEME_SELECTED);
-        row++;
+        current_y++;
         entry_index++;
     }
 
@@ -141,7 +149,7 @@ static void draw_status_line(AppState *state, EntryList *list)
     {
         cursor_position++;
     }
-    snprintf(right_buffer, sizeof(right_buffer), "%4d/%-4d", cursor_position, list->count_entries);
+    snprintf(right_buffer, sizeof(right_buffer), "%5d/%-4d", cursor_position, list->count_entries);
     int right_x = max_cols - strlen(right_buffer);
 
     WCOLOR_ON(stdscr, THEME_STATUS_POSITION);
@@ -167,13 +175,26 @@ static void draw_status_line(AppState *state, EntryList *list)
     }
     else
     {
-        snprintf(pos_percent, sizeof(pos_percent), "%-2.0f%% ", percent);
+        snprintf(pos_percent, sizeof(pos_percent), "%-2.0f%% ", floor(percent));
     }
     right_x = right_x - strlen(pos_percent);
 
     WCOLOR_ON(stdscr, THEME_STATUS_PERCENT);
     mvprintw(status_row, right_x, "%s", pos_percent);
     WCOLOR_OFF(stdscr, THEME_STATUS_PERCENT);
+}
+
+static int draw_split_line(void)
+{
+    int start_y = PATH_LINE;
+    int width = max_cols / 2;
+    int height = max_rows - STATUS_LINE - 2;
+
+    WCOLOR_ON(stdscr, THEME_PATH_LINE);
+    mvvline(PATH_LINE, max_cols / 2, ACS_VLINE, max_rows - STATUS_LINE - 2);
+    WCOLOR_OFF(stdscr, THEME_PATH_LINE);
+
+    return width;
 }
 
 static void adjust_scroll(int visible_lines, EntryList *list)
