@@ -81,10 +81,12 @@ A keymaps menu can also be found inside the program by pressing '?'
 
 | **Keymaps**                | **Action**             |
 |:--------------------------:|:----------------------:|
-|  /   or k/j              | Move up/down           |
-|  /   or h/l              | Move left/right        |
-| PgDn/PgUp or CTRL d/CTRL u | Move half page up/down |
-| Home/End or g/G            | Go top/bottom          |
+|  / , k/j                 | Move up/down           |
+|  / , h/l                 | Move left/right        |
+| PgUp/PgDn, ^U/^D           | Move half page         |
+| Home/End or gg/G           | Go top/bottom          |
+| g                          | Go to                  |
+| a                          | Create file or folder  |
 | Delete/d                   | Delete file            |
 | v                          | Open text editor       |
 
