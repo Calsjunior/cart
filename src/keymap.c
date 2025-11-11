@@ -15,6 +15,9 @@ Action get_action(int ch, AppState *state)
             break;
         case 27:
             return ESC;
+
+        case KEY_RESIZE:
+            return RESIZE;
     }
 
     if (state->mode == MODE_NORMAL)
@@ -23,8 +26,6 @@ Action get_action(int ch, AppState *state)
         {
             case '?':
                 return KEYMAP_HELP;
-            case KEY_RESIZE:
-                return RESIZE;
             case '.':
                 return TOGGLE_HIDDEN;
 
