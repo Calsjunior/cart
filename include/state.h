@@ -16,7 +16,6 @@ typedef enum
     PROMPT_NONE,
     PROMPT_HELP,
     PROMPT_DELETE,
-    PROMPT_OPEN,
     PROMPT_CREATE,
     PROMPT_GOTO,
 } PromptType;

@@ -19,7 +19,7 @@ void init_ui(void)
     noecho();             // Don't echo keypresses to screen
     curs_set(0);          // Display cursor
     keypad(stdscr, TRUE); // Enable special keys like arrow keys
-    // halfdelay(1);
+    halfdelay(1);
     set_escdelay(1);
     getmaxyx(stdscr, max_rows, max_cols);
     init_colors(); // From "colors.h"
@@ -200,8 +200,9 @@ static void handle_normal_mode(Action key, AppState *state, Stack *stack, EntryL
             break;
 
         case OPEN:
-            state->mode = MODE_PROMPT;
-            state->prompt_type = PROMPT_OPEN;
+            open_entry(state, list);
+            state->restore_cursor = true;
+            state->refresh = true;
             break;
 
         case CREATE:
@@ -256,12 +257,6 @@ static void handle_prompt_mode(Action key, AppState *state, Stack *stack, EntryL
                 helper_set_mode_normal(state);
             }
             break;
-
-        case PROMPT_OPEN:
-            open_entry(state, list);
-            helper_set_mode_normal(state);
-            state->restore_cursor = true;
-            state->refresh = true;
 
         case PROMPT_CREATE:
             if (key == CONFIRM_YES && state->input_state.input_pos > 0)
@@ -318,6 +313,12 @@ static void handle_text_input(Action key, AppState *state)
 static void handle_go_to_input(Action key, AppState *state, EntryList *list)
 {
     int ch = state->input_state.last_keypress;
+
+    if (key == ACTION_NONE)
+    {
+        return;
+    }
+
     switch (state->goto_state)
     {
         case GOTO_NONE:

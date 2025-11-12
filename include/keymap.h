@@ -42,7 +42,8 @@ typedef enum
     TOGGLE_HIDDEN,
     KEYMAP_HELP,
     ESC,
-    QUIT
+    QUIT,
+    ACTION_NONE = -1,
 } Action;
 
 Action get_action(int ch, AppState *state);
